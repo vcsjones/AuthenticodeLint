@@ -4,9 +4,25 @@ using System.Linq;
 
 namespace AuthenticodeLint
 {
+
+    public struct CommandLineParameter
+    {
+        private string _name, _value;
+
+        public CommandLineParameter(string name, string value)
+        {
+            _name = name;
+            _value = value;
+        }
+
+        public string Name => _name;
+        public string Value => _value;
+    }
+
+
     public class CommandLineParser
     {
-        public static IEnumerable<Tuple<string, string>> CreateCommandLineParametersWithValues(IEnumerable<string> input)
+        public static IEnumerable<CommandLineParameter> CreateCommandLineParametersWithValues(IEnumerable<string> input)
         {
             string parameterName = null;
             foreach (var token in input)
@@ -26,18 +42,18 @@ namespace AuthenticodeLint
                 //A named parameter immediate after a named one. Pop the existing named one off.
                 else if (token.Length >= 2 && token[0] == '-')
                 {
-                    yield return Tuple.Create(parameterName, (string)null);
+                    yield return new CommandLineParameter(parameterName.ToLowerInvariant(), null);
                     parameterName = token.Substring(1);
                 }
                 else
                 {
-                    yield return Tuple.Create(parameterName, token);
+                    yield return new CommandLineParameter(parameterName.ToLowerInvariant(), token);
                     parameterName = null;
                 }
             }
             if (parameterName != null)
             {
-                yield return Tuple.Create(parameterName, (string)null);
+                yield return new CommandLineParameter(parameterName.ToLowerInvariant(), null);
             }
         }
 
