@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckEngine.cs" />
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="IAuthenticodeRule.cs" />
     <Compile Include="Program.cs" />
