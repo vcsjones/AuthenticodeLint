@@ -103,26 +103,22 @@ namespace AuthenticodeLint
             var collectors = new List<IRuleResultCollector>();
             if (!quiet)
             {
-                collectors.Add(new StdOutResultCollector());
+                collectors.Add(new StdOutRuleResultCollector());
+            }
+            if (!string.IsNullOrWhiteSpace(report))
+            {
+                collectors.Add(new XmlRuleResultCollector(report));
             }
             var result = ExitCodes.Success;
             foreach (var file in inputs)
             {
                 var signatures = extractor.Extract(file);
-                if (signatures.Items.Count == 0)
-                {
-                    if (!quiet)
-                    {
-                        Console.Out.WriteLine($"File {file} is not authenticode signed.");
-                    }
-                    result = ExitCodes.ChecksFailed;
-                    continue;
-                }
                 if (CheckEngine.Instance.RunAllRules(file, signatures, collectors, suppress) != RuleEngineResult.AllPass)
                 {
                     result = ExitCodes.ChecksFailed;
                 }
             }
+            collectors.ForEach(c => c.Flush());
             return result;
         }
 
