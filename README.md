@@ -1,10 +1,10 @@
-# AuthenticodeLint
+# Authenticode Lint
 
-Lints an authenticode signed binary.
+Lints an Authenticode signed binary.
 
 The current state of this project is alpha and does little "linting". Much more to come.
 
-This tool aides in the checking of a binary to lint authenticode signed executables.
+This tool aides in the checking of a binary to lint Authenticode signed executables.
 
 Authenticode, or "digitally signing" a binary is the process of applying a digital signature to the file.
 Authenticode Lint looks at various aspects of the signature that might be problematic for users or all
