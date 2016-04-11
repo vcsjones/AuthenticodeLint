@@ -111,6 +111,7 @@ namespace AuthenticodeLint
                         Console.Out.WriteLine($"File {file} is not authenticode signed.");
                     }
                     result = ExitCodes.ChecksFailed;
+                    continue;
                 }
                 if (CheckEngine.Instance.RunAllRules(file, signatures, collectors, suppress) != RuleEngineResult.AllPass)
                 {
