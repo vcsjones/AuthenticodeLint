@@ -22,6 +22,20 @@ namespace AuthenticodeLint.Interop
             [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr ppvContext
          );
 
+        [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptDecodeObjectEx", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern unsafe bool CryptDecodeObjectEx
+        (
+            [param: In, MarshalAs(UnmanagedType.U4)] EncodingType dwCertEncodingType,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr lpszStructType,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr pbEncoded,
+            [param: In, MarshalAs(UnmanagedType.U4)] uint cbEncoded,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptDecodeFlags dwFlags,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr pDecodePara,
+            [param: In] IntPtr* pvStructInfo,
+            [param: In, Out, MarshalAs(UnmanagedType.U4)] ref uint pcbStructInfo
+        );
+
         [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptMsgClose", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CryptMsgClose([param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr hCryptMsg);
@@ -177,5 +191,11 @@ namespace AuthenticodeLint.Interop
     {
         PKCS_7_ASN_ENCODING = 0x10000,
         X509_ASN_ENCODING = 0x1
+    }
+
+    [type: Flags]
+    internal enum CryptDecodeFlags : uint
+    {
+        CRYPT_DECODE_ALLOC_FLAG = 0x8000
     }
 }

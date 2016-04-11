@@ -20,7 +20,8 @@ namespace AuthenticodeLint
             {
                 new Sha1PrimarySignatureRule(),
                 new Sha2SignatureExistsRule(),
-                new NoWeakFileDigestAlgorithmsRule()
+                new NoWeakFileDigestAlgorithmsRule(),
+                new TimestampedRule(),
             };
         }
 
