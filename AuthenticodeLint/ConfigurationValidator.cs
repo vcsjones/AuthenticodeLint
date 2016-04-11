@@ -6,14 +6,14 @@ namespace AuthenticodeLint
 {
     public class CheckConfiguration
     {
-        public string InputPath { get; }
+        public IReadOnlyList<string> InputPaths { get; }
         public string ReportPath { get; }
         public bool Quiet { get; }
         public HashSet<int> SuppressErrorIDs { get; }
 
-        public CheckConfiguration(string inputPath, string reportPath, bool quiet, HashSet<int> suppressErrorIDs)
+        public CheckConfiguration(IReadOnlyList<string> inputPaths, string reportPath, bool quiet, HashSet<int> suppressErrorIDs)
         {
-            InputPath = inputPath;
+            InputPaths = inputPaths;
             ReportPath = reportPath;
             Quiet = quiet;
             SuppressErrorIDs = suppressErrorIDs;
@@ -26,10 +26,13 @@ namespace AuthenticodeLint
         public static bool ValidateAndPrint(CheckConfiguration configuration, TextWriter printer)
         {
             bool success = true;
-            if (!File.Exists(configuration.InputPath))
+            foreach (var path in configuration.InputPaths)
             {
-                printer.WriteLine($"The input path ${configuration.InputPath} does not exist.");
-                success = false;
+                if (!File.Exists(path))
+                {
+                    printer.WriteLine($"The input path ${path} does not exist.");
+                    success = false;
+                }
             }
             var rules = CheckEngine.Instance.GetRules();
             foreach (var suppression in configuration.SuppressErrorIDs)

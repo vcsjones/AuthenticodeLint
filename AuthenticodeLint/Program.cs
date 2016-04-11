@@ -18,7 +18,7 @@ namespace AuthenticodeLint
                 //As a successful build incase the build system is incorrectly passing arguments.
                 return ExitCodes.InvalidInputOrConfig;
             }
-            string input = null;
+            var inputs = new List<string>();
             var suppress = new HashSet<int>();
             bool quiet = false;
             string report = null;
@@ -26,7 +26,7 @@ namespace AuthenticodeLint
             {
                 if (parameter.Name == "in")
                 {
-                    input = parameter.Value;
+                    inputs.Add(parameter.Value);
                 }
                 else if (parameter.Name == "suppress")
                 {
@@ -68,34 +68,41 @@ namespace AuthenticodeLint
                     return ExitCodes.InvalidInputOrConfig;
                 }
             }
-            if (string.IsNullOrWhiteSpace(input))
+            if (inputs.Count == 0)
             {
                 Console.Error.WriteLine("Input is expected. See -help for usage.");
                 return ExitCodes.InvalidInputOrConfig;
             }
-            var configuration = new CheckConfiguration(input, report, quiet, suppress);
+            var configuration = new CheckConfiguration(inputs, report, quiet, suppress);
 
             if (!ConfigurationValidator.ValidateAndPrint(configuration, Console.Error))
             {
                 return ExitCodes.InvalidInputOrConfig;
             }
             var extractor = new SignatureExtractor();
-            var signatures = extractor.Extract(input);
-            if (signatures.Count == 0)
-            {
-                if (!quiet)
-                {
-                    Console.Out.WriteLine("File is not authenticode signed.");
-                }
-                return ExitCodes.NoAuthenticodeSignature;
-            }
             var collectors = new List<IRuleResultCollector>();
             if (!quiet)
             {
                 collectors.Add(new StdOutResultCollector());
             }
-            var result = CheckEngine.Instance.RunAllRules(signatures, collectors, suppress);
-            return result == RuleEngineResult.AllPass ? ExitCodes.Success : ExitCodes.ChecksFailed;
+            var result = ExitCodes.Success;
+            foreach (var file in inputs)
+            {
+                var signatures = extractor.Extract(file);
+                if (signatures.Count == 0)
+                {
+                    if (!quiet)
+                    {
+                        Console.Out.WriteLine($"File {file} is not authenticode signed.");
+                    }
+                    result = ExitCodes.ChecksFailed;
+                }
+                if (CheckEngine.Instance.RunAllRules(file, signatures, collectors, suppress) != RuleEngineResult.AllPass)
+                {
+                    result = ExitCodes.ChecksFailed;
+                }
+            }
+            return result;
         }
 
         static void ShowInvalidSuppression() => Console.Error.WriteLine("Invalid list of errors to suppress. Use -help for more information.");
@@ -108,17 +115,16 @@ Checks the authenticode signature of your binaries.
 
 Usage: authlint.exe -in ""C:\path to an\executable.exe""
 
-    -in:        A path to an executable, DLL, or MSI to lint. Required.
+    -in:        A path to an executable, DLL, or MSI to lint. Can be specified multiple times. Required.
     -suppress:  A comma separated list of error IDs to ignore. All checks are run if omitted. Optional.
     -q|quite:   Run quitely and do not print anything to the output. Optional.
     -report:    A path to produce an XML file as a report. Optional.
 
 Exit codes:
 
-    0:      All checks passed, excluding any that were suppressed.
+    0:      All checks passed for all inputs, excluding any that were suppressed.
     1:      Invalid input or configuration was specified.
-    2:      One or more checks failed.
-    3:      The target specified is not authenticode signed at all.
+    2:      One or more checks failed, or the file is not authenticode signed.
 ");
         }
     }
@@ -128,7 +134,6 @@ Exit codes:
         public static int Success { get; } = 0;
         public static int InvalidInputOrConfig { get; } = 1;
         public static int ChecksFailed { get; } = 2;
-        public static int NoAuthenticodeSignature { get; } = 3;
         public static int UnknownResults { get; } = 0xFF;
     }
 }

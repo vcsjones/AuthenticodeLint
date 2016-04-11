@@ -23,11 +23,12 @@ namespace AuthenticodeLint
             };
         }
 
-        public RuleEngineResult RunAllRules(IReadOnlyList<SignerInfo> signatures, List<IRuleResultCollector> collectors, HashSet<int> suppressedRuleIDs)
+        public RuleEngineResult RunAllRules(string file, IReadOnlyList<SignerInfo> signatures, List<IRuleResultCollector> collectors, HashSet<int> suppressedRuleIDs)
         {
 
             var rules = GetRules();
             var engineResult = RuleEngineResult.AllPass;
+            collectors.ForEach(c => c.BeginSet(file));
             foreach(var rule in rules)
             {
                 RuleResult result;
@@ -45,6 +46,7 @@ namespace AuthenticodeLint
                 }
                 collectors.ForEach(c => c.CollectResult(rule, result));
             }
+            collectors.ForEach(c => c.CompleteSet());
             return engineResult;
         }
     }
@@ -52,24 +54,44 @@ namespace AuthenticodeLint
     public interface IRuleResultCollector
     {
         void CollectResult(IAuthenticodeRule rule, RuleResult result);
+        void BeginSet(string setName);
+        void CompleteSet();
     }
 
     public class StdOutResultCollector : IRuleResultCollector
     {
+        private string _setName;
+
+        public void BeginSet(string setName)
+        {
+            _setName = setName;
+            Console.Out.WriteLine($"Start checks for {_setName}.");
+        }
+
         public void CollectResult(IAuthenticodeRule rule, RuleResult result)
         {
+            if (_setName == null)
+            {
+                throw new InvalidOperationException("Cannot collect results for an unknown set.");
+            }
+
             switch(result)
             {
                 case RuleResult.Skip:
-                    Console.Out.WriteLine($"Rule #{rule.RuleId} \"{rule.RuleName}\" was skipped because it was suppressed.");
+                    Console.Out.WriteLine($"\tRule #{rule.RuleId} \"{rule.RuleName}\" was skipped because it was suppressed.");
                     break;
                 case RuleResult.Fail:
-                    Console.Out.WriteLine($"Rule #{rule.RuleId} \"{rule.RuleName}\" failed.");
+                    Console.Out.WriteLine($"\tRule #{rule.RuleId} \"{rule.RuleName}\" failed.");
                     break;
                 case RuleResult.Pass:
-                    Console.Out.WriteLine($"Rule #{rule.RuleId} \"{rule.RuleName}\" passed.");
+                    Console.Out.WriteLine($"\tRule #{rule.RuleId} \"{rule.RuleName}\" passed.");
                     break;
             }
+        }
+
+        public void CompleteSet()
+        {
+            Console.Out.WriteLine($"Complete checks for {_setName}.");
         }
     }
 
