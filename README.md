@@ -24,6 +24,10 @@ Rules can be suppressed with the `-suppress` option:
 
 More information and options are available using `-help`.
 
+# Documentation
+
+Documentation for usage and for each rule is documented [on the wiki](https://github.com/vcsjones/AuthenticodeLint/wiki).
+
 # Goals
 
 The purpose of this tool is not to validate that everything uses the strongest signature algorithms
