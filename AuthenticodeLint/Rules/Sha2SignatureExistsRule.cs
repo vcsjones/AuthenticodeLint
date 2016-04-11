@@ -13,8 +13,9 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "A SHA2 signature should exist.";
 
-        public RuleResult Validate(IReadOnlyList<SignerInfo> signatures)
+        public RuleResult Validate(Graph<SignerInfo> graph)
         {
+            var signatures = graph.VisitAll();
             if (signatures.Any(s =>
                 s.DigestAlgorithm.Value == KnownOids.SHA256 ||
                 s.DigestAlgorithm.Value == KnownOids.SHA384 ||

@@ -13,9 +13,9 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Primary signature should be SHA1.";
 
-        public RuleResult Validate(IReadOnlyList<SignerInfo> signatures)
+        public RuleResult Validate(Graph<SignerInfo> signatures)
         {
-            var primary = signatures.FirstOrDefault();
+            var primary = signatures.Items.SingleOrDefault()?.Node;
             //There are zero signatures.
             if (primary == null)
             {

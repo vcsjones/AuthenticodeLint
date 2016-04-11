@@ -9,7 +9,7 @@ namespace AuthenticodeLint
 {
     public class SignatureExtractor
     {
-        public IReadOnlyList<SignerInfo> Extract(string filePath)
+        public Graph<SignerInfo> Extract(string filePath)
         {
             EncodingType encodingType;
             CryptQueryContentType contentType;
@@ -23,7 +23,7 @@ namespace AuthenticodeLint
                 switch(unchecked((uint)resultCode))
                 {
                     case 0x80092009: //Cannot find request object. There's no signature.
-                        return new List<SignerInfo>();
+                        return Graph<SignerInfo>.Empty;
                     default:
                         throw new Win32Exception(resultCode, "Failed to extract signature.");
                 }
@@ -35,12 +35,11 @@ namespace AuthenticodeLint
                 {
                     return null;
                 }
-                var signatures = GetSignatures(message);
-                return signatures;
+                return GetSignatures(message);
             }
         }
 
-        private unsafe IReadOnlyList<SignerInfo> GetSignatures(CryptMsgSafeHandle messageHandle)
+        private unsafe Graph<SignerInfo> GetSignatures(CryptMsgSafeHandle messageHandle)
         {
             uint size = 0;
             var signatures = new List<SignerInfo>();
@@ -51,16 +50,45 @@ namespace AuthenticodeLint
                 {
                     if (Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_ENCODED_MESSAGE, 0, buf, ref size))
                     {
-                        return RecursiveSigner(buffer);
+                        return RecursiveSigner(new List<byte[]> { buffer });
                     }
                 }
             }
             return null;
         }
 
-        private static IReadOnlyList<SignerInfo> RecursiveSigner(byte[] cmsData)
+
+        public static Graph<SignerInfo> RecursiveSigner(IList<byte[]> cmsData)
         {
             const string nestedSignatureOid = "1.3.6.1.4.1.311.2.4.1";
+            var graphItems = new List<GraphItem<SignerInfo>>();
+            foreach (var data in cmsData)
+            {
+                var cms = new SignedCms();
+                cms.Decode(data);
+                foreach (var signer in cms.SignerInfos)
+                {
+                    var childCms = new List<byte[]>();
+                    foreach (var attribute in signer.UnsignedAttributes)
+                    {
+                        if (attribute.Oid.Value == nestedSignatureOid)
+                        {
+                            foreach (var value in attribute.Values)
+                            {
+                                childCms.Add(value.RawData);
+                            }
+                        }
+                    }
+                    graphItems.Add(new GraphItem<SignerInfo>(signer, RecursiveSigner(childCms)));
+                }
+            }
+            return new Graph<SignerInfo>(graphItems);
+
+        }
+
+        /*
+        private static IReadOnlyList<SignerInfo> RecursiveSigner(byte[] cmsData)
+        {
             var list = new List<SignerInfo>();
             var cms = new SignedCms();
             cms.Decode(cmsData);
@@ -80,5 +108,7 @@ namespace AuthenticodeLint
             }
             return list.AsReadOnly();
         }
+
+    */
     }
 }

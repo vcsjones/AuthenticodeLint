@@ -23,7 +23,7 @@ namespace AuthenticodeLint
             };
         }
 
-        public RuleEngineResult RunAllRules(string file, IReadOnlyList<SignerInfo> signatures, List<IRuleResultCollector> collectors, HashSet<int> suppressedRuleIDs)
+        public RuleEngineResult RunAllRules(string file, Graph<SignerInfo> signatures, List<IRuleResultCollector> collectors, HashSet<int> suppressedRuleIDs)
         {
 
             var rules = GetRules();

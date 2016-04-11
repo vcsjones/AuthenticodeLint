@@ -109,7 +109,7 @@ namespace AuthenticodeLint
             foreach (var file in inputs)
             {
                 var signatures = extractor.Extract(file);
-                if (signatures.Count == 0)
+                if (signatures.Items.Count == 0)
                 {
                     if (!quiet)
                     {
