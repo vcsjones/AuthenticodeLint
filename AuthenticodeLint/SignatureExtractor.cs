@@ -83,32 +83,6 @@ namespace AuthenticodeLint
                 }
             }
             return new Graph<SignerInfo>(graphItems);
-
         }
-
-        /*
-        private static IReadOnlyList<SignerInfo> RecursiveSigner(byte[] cmsData)
-        {
-            var list = new List<SignerInfo>();
-            var cms = new SignedCms();
-            cms.Decode(cmsData);
-            foreach(var signer in cms.SignerInfos)
-            {
-                list.Add(signer);
-                foreach(var attribute in signer.UnsignedAttributes)
-                {
-                    if (attribute.Oid.Value == nestedSignatureOid)
-                    {
-                        foreach(var values in attribute.Values)
-                        {
-                            list.AddRange(RecursiveSigner(values.RawData));
-                        }
-                    }
-                }
-            }
-            return list.AsReadOnly();
-        }
-
-    */
     }
 }
