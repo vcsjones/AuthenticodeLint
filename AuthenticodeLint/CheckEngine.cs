@@ -19,7 +19,8 @@ namespace AuthenticodeLint
             return new List<IAuthenticodeRule>
             {
                 new Sha1PrimarySignatureRule(),
-                new Sha2SignatureExistsRule()
+                new Sha2SignatureExistsRule(),
+                new NoWeakFileDigestAlgorithmsRule()
             };
         }
 

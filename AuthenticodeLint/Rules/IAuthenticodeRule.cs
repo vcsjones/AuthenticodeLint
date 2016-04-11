@@ -8,6 +8,6 @@ namespace AuthenticodeLint.Rules
         int RuleId { get; }
         string ShortDescription { get; }
         string RuleName { get; }
-        RuleResult Validate(Graph<SignerInfo> signatures);
+        RuleResult Validate(Graph<SignerInfo> graph);
     }
 }
