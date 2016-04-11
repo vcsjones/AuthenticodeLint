@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace AuthenticodeLint
@@ -26,7 +27,21 @@ namespace AuthenticodeLint
             {
                 if (parameter.Name == "in")
                 {
-                    inputs.Add(parameter.Value);
+                    //The value contains a pattern.
+                    if (parameter.Value?.Contains("*") == true || parameter.Value?.Contains("?") == true)
+                    {
+                        var filePattern = Path.GetFileName(parameter.Value);
+                        var directory = Path.GetDirectoryName(parameter.Value);
+                        if (Directory.Exists(directory))
+                        {
+                            var files = Directory.GetFiles(directory, filePattern, SearchOption.TopDirectoryOnly);
+                            inputs.AddRange(files);
+                        }
+                    }
+                    else
+                    {
+                        inputs.Add(parameter.Value);
+                    }
                 }
                 else if (parameter.Name == "suppress")
                 {
@@ -115,7 +130,7 @@ Checks the authenticode signature of your binaries.
 
 Usage: authlint.exe -in ""C:\path to an\executable.exe""
 
-    -in:        A path to an executable, DLL, or MSI to lint. Can be specified multiple times. Required.
+    -in:        A path to an executable, DLL, or MSI to lint. Can be specified multiple times. Supports wildcards. Required.
     -suppress:  A comma separated list of error IDs to ignore. All checks are run if omitted. Optional.
     -q|quite:   Run quitely and do not print anything to the output. Optional.
     -report:    A path to produce an XML file as a report. Optional.
