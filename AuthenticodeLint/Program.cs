@@ -27,10 +27,15 @@ namespace AuthenticodeLint
             {
                 if (parameter.Name == "in")
                 {
-                    //The value contains a pattern.
-                    if (parameter.Value?.Contains("*") == true || parameter.Value?.Contains("?") == true)
+                    if (string.IsNullOrWhiteSpace(parameter.Value))
                     {
-                        var filePattern = Path.GetFileName(parameter.Value);
+                        Console.Error.WriteLine("A value is required for input.");
+                        return ExitCodes.InvalidInputOrConfig;
+                    }
+                    var filePattern = Path.GetFileName(parameter.Value);
+                    //The value contains a pattern.
+                    if (filePattern.Contains("*") || filePattern.Contains("?"))
+                    {
                         var directory = Path.GetDirectoryName(parameter.Value);
                         if (Directory.Exists(directory))
                         {
