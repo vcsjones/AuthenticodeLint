@@ -79,8 +79,15 @@ namespace AuthenticodeLint
             {
                 return ExitCodes.InvalidInputOrConfig;
             }
-            //This is not normally expected, if this is the exit code then something is broken.
-            return ExitCodes.UnknownResults;
+            var extractor = new SignatureExtractor();
+            var signatures = extractor.Extract(input);
+            var collectors = new List<IRuleResultCollector>();
+            if (!quiet)
+            {
+                collectors.Add(new StdOutResultCollector());
+            }
+            var result = CheckEngine.Instance.RunAllRules(signatures, collectors, suppress);
+            return result == RuleEngineResult.AllPass ? ExitCodes.Success : ExitCodes.ChecksFailed;
         }
 
         static void ShowInvalidSuppression() => Console.Error.WriteLine("Invalid list of errors to suppress. Use -help for more information.");

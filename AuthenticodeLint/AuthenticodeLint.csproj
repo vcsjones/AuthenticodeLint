@@ -22,6 +22,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,10 +33,13 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,13 +50,23 @@
   <ItemGroup>
     <Compile Include="CheckEngine.cs" />
     <Compile Include="CommandLineParser.cs" />
-    <Compile Include="IAuthenticodeRule.cs" />
+    <Compile Include="ConfigurationValidator.cs" />
+    <Compile Include="Interop\CertStoreSafeHandle.cs" />
+    <Compile Include="Interop\Crypt32.cs" />
+    <Compile Include="Interop\CryptMsgSafeHandle.cs" />
+    <Compile Include="KnownOids.cs" />
+    <Compile Include="Rules\IAuthenticodeRule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rules\RuleResult.cs" />
+    <Compile Include="Rules\Sha1PrimarySignatureRule.cs" />
+    <Compile Include="Rules\Sha2SignatureExistsRule.cs" />
+    <Compile Include="SignatureExtractor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

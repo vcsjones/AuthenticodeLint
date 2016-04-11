@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.IO;
+using AuthenticodeLint.Rules;
+using System.Security.Cryptography.Pkcs;
+using System;
 using System.Linq;
 
 namespace AuthenticodeLint
@@ -15,49 +17,66 @@ namespace AuthenticodeLint
 
         public IReadOnlyList<IAuthenticodeRule> GetRules()
         {
-            return new List<IAuthenticodeRule>();
-        }
-    }
-
-    public class CheckConfiguration
-    {
-        public string InputPath { get; }
-        public string ReportPath { get; }
-        public bool Quiet { get; }
-        public IReadOnlyList<int> SuppressErrorIDs { get; }
-
-        public CheckConfiguration(string inputPath, string reportPath, bool quiet, IReadOnlyList<int> suppressErrorIDs)
-        {
-            InputPath = inputPath;
-            ReportPath = reportPath;
-            Quiet = quiet;
-            SuppressErrorIDs = suppressErrorIDs;
-        }
-    }
-
-    public static class ConfigurationValidator
-    {
-        //Does its best to validate the configuration, such as the path actually existing, etc.
-        public static bool ValidateAndPrint(CheckConfiguration configuration, TextWriter printer)
-        {
-            bool success = true;
-            if (!File.Exists(configuration.InputPath))
+            return new List<IAuthenticodeRule>
             {
-                printer.WriteLine($"The input path ${configuration.InputPath} does not exist.");
-                success = false;
-            }
-            var rules = CheckEngine.Instance.GetRules();
-            foreach(var suppression in configuration.SuppressErrorIDs)
+                new Sha1PrimarySignatureRule(),
+                new Sha2SignatureExistsRule()
+            };
+        }
+
+        public RuleEngineResult RunAllRules(IReadOnlyList<SignerInfo> signatures, List<IRuleResultCollector> collectors, IReadOnlyList<int> suppressedRuleIDs)
+        {
+
+            var rules = GetRules();
+            var engineResult = RuleEngineResult.AllPass;
+            foreach(var rule in rules)
             {
-                if (!rules.Any(r => r.RuleId == suppression))
+                RuleResult result;
+                if (suppressedRuleIDs.Contains(rule.RuleId))
                 {
-                    printer.WriteLine($"Error {suppression} is not a valid ID.");
-                    success = false;
+                    result = RuleResult.Skip;
                 }
+                else
+                {
+                    result = rule.Validate(signatures);
+                    if (result != RuleResult.Pass)
+                    {
+                        engineResult = RuleEngineResult.NotAllPass;
+                    }
+                }
+                collectors.ForEach(c => c.CollectResult(rule, result));
             }
-            return success;
+            return engineResult;
         }
     }
 
+    public interface IRuleResultCollector
+    {
+        void CollectResult(IAuthenticodeRule rule, RuleResult result);
+    }
 
+    public class StdOutResultCollector : IRuleResultCollector
+    {
+        public void CollectResult(IAuthenticodeRule rule, RuleResult result)
+        {
+            switch(result)
+            {
+                case RuleResult.Skip:
+                    Console.Out.WriteLine($"Rule #{rule.RuleId} \"{rule.RuleName}\" was skipped because it was suppressed.");
+                    break;
+                case RuleResult.Fail:
+                    Console.Out.WriteLine($"Rule #{rule.RuleId} \"{rule.RuleName}\" failed.");
+                    break;
+                case RuleResult.Pass:
+                    Console.Out.WriteLine($"Rule #{rule.RuleId} \"{rule.RuleName}\" passed.");
+                    break;
+            }
+        }
+    }
+
+    public enum RuleEngineResult
+    {
+        AllPass,
+        NotAllPass
+    }
 }
