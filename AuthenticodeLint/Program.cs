@@ -138,7 +138,7 @@ Usage: authlint.exe -in ""C:\path to an\executable.exe""
 
     -in:        A path to an executable, DLL, or MSI to lint. Can be specified multiple times. Supports wildcards. Required.
     -suppress:  A comma separated list of error IDs to ignore. All checks are run if omitted. Optional.
-    -q|quite:   Run quitely and do not print anything to the output. Optional.
+    -q|quiet:   Run quietly and do not print anything to the output. Optional.
     -report:    A path to produce an XML file as a report. Optional.
 
 Exit codes:
