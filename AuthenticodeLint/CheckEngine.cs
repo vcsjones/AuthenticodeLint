@@ -2,7 +2,6 @@
 using AuthenticodeLint.Rules;
 using System.Security.Cryptography.Pkcs;
 using System;
-using System.Linq;
 
 namespace AuthenticodeLint
 {
@@ -24,7 +23,7 @@ namespace AuthenticodeLint
             };
         }
 
-        public RuleEngineResult RunAllRules(IReadOnlyList<SignerInfo> signatures, List<IRuleResultCollector> collectors, IReadOnlyList<int> suppressedRuleIDs)
+        public RuleEngineResult RunAllRules(IReadOnlyList<SignerInfo> signatures, List<IRuleResultCollector> collectors, HashSet<int> suppressedRuleIDs)
         {
 
             var rules = GetRules();

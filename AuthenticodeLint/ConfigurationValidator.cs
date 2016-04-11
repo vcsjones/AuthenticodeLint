@@ -9,9 +9,9 @@ namespace AuthenticodeLint
         public string InputPath { get; }
         public string ReportPath { get; }
         public bool Quiet { get; }
-        public IReadOnlyList<int> SuppressErrorIDs { get; }
+        public HashSet<int> SuppressErrorIDs { get; }
 
-        public CheckConfiguration(string inputPath, string reportPath, bool quiet, IReadOnlyList<int> suppressErrorIDs)
+        public CheckConfiguration(string inputPath, string reportPath, bool quiet, HashSet<int> suppressErrorIDs)
         {
             InputPath = inputPath;
             ReportPath = reportPath;

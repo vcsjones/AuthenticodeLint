@@ -19,7 +19,7 @@ namespace AuthenticodeLint
                 return ExitCodes.InvalidInputOrConfig;
             }
             string input = null;
-            var suppress = new List<int>();
+            var suppress = new HashSet<int>();
             bool quiet = false;
             string report = null;
             foreach(var parameter in parsedCommandLine)
@@ -81,6 +81,14 @@ namespace AuthenticodeLint
             }
             var extractor = new SignatureExtractor();
             var signatures = extractor.Extract(input);
+            if (signatures.Count == 0)
+            {
+                if (!quiet)
+                {
+                    Console.Out.WriteLine("File is not authenticode signed.");
+                }
+                return ExitCodes.NoAuthenticodeSignature;
+            }
             var collectors = new List<IRuleResultCollector>();
             if (!quiet)
             {
