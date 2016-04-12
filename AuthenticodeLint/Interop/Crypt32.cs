@@ -22,6 +22,23 @@ namespace AuthenticodeLint.Interop
             [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr ppvContext
          );
 
+        [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptQueryObject", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool CryptQueryObject
+        (
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryObjectType dwObjectType,
+            [param: In, Out, MarshalAs(UnmanagedType.Struct)] ref CRYPTOAPI_BLOB pvObject,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryContentFlagType dwExpectedContentTypeFlags,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryFormatFlagType dwExpectedFormatTypeFlags,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryObjectFlags dwFlags,
+            [param: Out, MarshalAs(UnmanagedType.U4)] out EncodingType pdwMsgAndCertEncodingType,
+            [param: Out, MarshalAs(UnmanagedType.U4)] out CryptQueryContentType pdwContentType,
+            [param: Out, MarshalAs(UnmanagedType.U4)] out CryptQueryFormatType pdwFormatType,
+            [param: Out] out CertStoreSafeHandle phCertStore,
+            [param: Out] out CryptMsgSafeHandle phMsg,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr ppvContext
+         );
+
         [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptDecodeObjectEx", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern unsafe bool CryptDecodeObjectEx
@@ -32,8 +49,29 @@ namespace AuthenticodeLint.Interop
             [param: In, MarshalAs(UnmanagedType.U4)] uint cbEncoded,
             [param: In, MarshalAs(UnmanagedType.U4)] CryptDecodeFlags dwFlags,
             [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr pDecodePara,
-            [param: In] IntPtr* pvStructInfo,
+            [param: Out] out LocalBufferSafeHandle pvStructInfo,
             [param: In, Out, MarshalAs(UnmanagedType.U4)] ref uint pcbStructInfo
+        );
+
+        [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptMsgOpenToDecode", SetLastError = true)]
+        public static extern unsafe CryptMsgSafeHandle CryptMsgOpenToDecode
+        (
+            [param: In, MarshalAs(UnmanagedType.U4)] EncodingType dwCertEncodingType,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptMsgOpenFlags dwFlags,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptMsgType dwMsgType,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr hCryptProv,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr pRecipientInfo,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr pStreamInfo
+        );
+
+        [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptMsgUpdate", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern unsafe bool CryptMsgUpdate
+        (
+            [param: In] CryptMsgSafeHandle hCryptMsg,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr pbData,
+            [param: In, MarshalAs(UnmanagedType.U4)] uint cbData,
+            [param: In, MarshalAs(UnmanagedType.Bool)] bool fFinal
         );
 
         [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptMsgClose", SetLastError = true)]
@@ -46,6 +84,17 @@ namespace AuthenticodeLint.Interop
         (
             [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr hCertStore,
             [param: In, MarshalAs(UnmanagedType.U4)] uint dwFlags
+        );
+
+        [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptMsgGetParam", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static unsafe extern bool CryptMsgGetParam
+        (
+            [param: In] CryptMsgSafeHandle hCryptMsg,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptMsgParamType dwParamType,
+            [param: In, MarshalAs(UnmanagedType.U4)] uint dwIndex,
+            [param: In] LocalBufferSafeHandle pvData,
+            [param: In, Out, MarshalAs(UnmanagedType.U4)] ref uint pcbData
         );
 
         [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptMsgGetParam", SetLastError = true)]
@@ -118,7 +167,7 @@ namespace AuthenticodeLint.Interop
         CERT_QUERY_CONTENT_FLAG_PKCS7_SIGNED = 1u << (int)CryptQueryContentType.CERT_QUERY_CONTENT_PKCS7_SIGNED,
         CERT_QUERY_CONTENT_FLAG_PKCS7_UNSIGNED = 1u << (int)CryptQueryContentType.CERT_QUERY_CONTENT_PKCS7_UNSIGNED,
         CERT_QUERY_CONTENT_FLAG_PKCS7_SIGNED_EMBED = 1u << (int)CryptQueryContentType.CERT_QUERY_CONTENT_PKCS7_SIGNED_EMBED,
-        CERT_QUERY_CONTENT_FLAG_PKCS10 = 1u <<(int)CryptQueryContentType.CERT_QUERY_CONTENT_PKCS10,
+        CERT_QUERY_CONTENT_FLAG_PKCS10 = 1u << (int)CryptQueryContentType.CERT_QUERY_CONTENT_PKCS10,
         CERT_QUERY_CONTENT_FLAG_PFX = 1u << (int)CryptQueryContentType.CERT_QUERY_CONTENT_PFX,
         CERT_QUERY_CONTENT_FLAG_CERT_PAIR = 1u << (int)CryptQueryContentType.CERT_QUERY_CONTENT_CERT_PAIR,
         CERT_QUERY_CONTENT_FLAG_PFX_AND_LOAD = 1u << (int)CryptQueryContentType.CERT_QUERY_CONTENT_PFX_AND_LOAD,
@@ -175,7 +224,7 @@ namespace AuthenticodeLint.Interop
         CERT_QUERY_FORMAT_FLAG_BINARY = 1u << (int)CryptQueryFormatType.CERT_QUERY_FORMAT_BINARY,
         CERT_QUERY_FORMAT_FLAG_BASE64_ENCODED = 1u << (int)CryptQueryFormatType.CERT_QUERY_FORMAT_BASE64_ENCODED,
         CERT_QUERY_FORMAT_FLAG_ASN_ASCII_HEX_ENCODED = 1u << (int)CryptQueryFormatType.CERT_QUERY_FORMAT_ASN_ASCII_HEX_ENCODED,
-        CERT_QUERY_FORMAT_FLAG_ALL = 
+        CERT_QUERY_FORMAT_FLAG_ALL =
             CERT_QUERY_FORMAT_FLAG_BINARY |
             CERT_QUERY_FORMAT_FLAG_BASE64_ENCODED |
             CERT_QUERY_FORMAT_FLAG_ASN_ASCII_HEX_ENCODED
@@ -197,5 +246,60 @@ namespace AuthenticodeLint.Interop
     internal enum CryptDecodeFlags : uint
     {
         CRYPT_DECODE_ALLOC_FLAG = 0x8000
+    }
+
+    [type: Flags]
+    internal enum CryptMsgOpenFlags : uint
+    {
+        CMSG_BARE_CONTENT_FLAG = 0x00000001,
+        CMSG_LENGTH_ONLY_FLAG = 0x00000002,
+        CMSG_DETACHED_FLAG = 0x00000004,
+        CMSG_AUTHENTICATED_ATTRIBUTES_FLAG = 0x00000008,
+        CMSG_CONTENTS_OCTETS_FLAG = 0x00000010,
+        CMSG_MAX_LENGTH_FLAG = 0x00000020,
+    }
+
+    internal enum CryptMsgType : uint
+    {
+        CMSG_DATA = 1,
+        CMSG_SIGNED = 2,
+        CMSG_ENVELOPED = 3,
+        CMSG_SIGNED_AND_ENVELOPED = 4,
+        CMSG_HASHED = 5,
+        CMSG_ENCRYPTED = 6,
+    }
+
+    [type: StructLayout(LayoutKind.Sequential)]
+    internal struct CRYPTOAPI_BLOB
+    {
+        public uint cbData;
+        public IntPtr pbData;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    internal struct CRYPT_ALGORITHM_IDENTIFIER
+    {
+        public string pszObjId;
+        public CRYPTOAPI_BLOB Parameters;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    internal struct CMSG_SIGNER_INFO
+    {
+        internal uint dwVersion;
+        internal CRYPTOAPI_BLOB Issuer;
+        internal CRYPTOAPI_BLOB SerialNumber;
+        internal CRYPT_ALGORITHM_IDENTIFIER HashAlgorithm;
+        internal CRYPT_ALGORITHM_IDENTIFIER HashEncryptionAlgorithm;
+        internal CRYPTOAPI_BLOB EncryptedHash;
+        internal CRYPT_ATTRIBUTES AuthAttrs;
+        internal CRYPT_ATTRIBUTES UnauthAttrs;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential)]
+    internal struct CRYPT_ATTRIBUTES
+    {
+        internal uint cAttr;
+        internal IntPtr rgAttr;
     }
 }

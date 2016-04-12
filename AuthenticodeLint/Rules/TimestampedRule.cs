@@ -10,17 +10,31 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Signatures should have a time stamped counter signer.";
 
-        public RuleResult Validate(Graph<SignerInfo> graph)
+        public unsafe RuleResult Validate(Graph<SignerInfo> graph)
         {
             var signatures = graph.VisitAll();
-            foreach(var signature in signatures)
+            foreach (var signature in signatures)
             {
                 var isSigned = false;
-                foreach(var attribute in signature.UnsignedAttributes)
+                foreach (var attribute in signature.UnsignedAttributes)
                 {
-                    if (attribute.Oid.Value == KnownOids.AuthenticodeCounterSignature || attribute.Oid.Value == KnownOids.RFC3161CounterSignature)
+                    SignatureBase timeStampCounterSign = null;
+                    if (attribute.Oid.Value == KnownOids.Rfc3161CounterSignature)
+                    {
+                        timeStampCounterSign = new Rfc3161Signature(attribute.Values[0]);
+                    }
+                    else if (attribute.Oid.Value == KnownOids.AuthenticodeCounterSignature)
+                    {
+                        timeStampCounterSign = new AuthenticodeSignature(attribute.Values[0]);
+                    }
+                    if (timeStampCounterSign == null)
+                    {
+                        continue;
+                    }
+                    if (timeStampCounterSign.DigestAlgorithm.Value == signature.DigestAlgorithm.Value)
                     {
                         isSigned = true;
+                        break;
                     }
                 }
                 if (!isSigned)

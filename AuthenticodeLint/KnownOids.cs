@@ -11,7 +11,7 @@
         public static string MD2 { get; } = "1.2.840.113549.2.2";
 
 
-        public static string RFC3161CounterSignature { get; } = "1.3.6.1.4.1.311.3.3.1";
+        public static string Rfc3161CounterSignature { get; } = "1.3.6.1.4.1.311.3.3.1";
         public static string AuthenticodeCounterSignature { get; } = "1.2.840.113549.1.9.6";
     }
 }

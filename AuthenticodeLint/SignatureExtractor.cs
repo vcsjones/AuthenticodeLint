@@ -43,7 +43,7 @@ namespace AuthenticodeLint
         {
             uint size = 0;
             var signatures = new List<SignerInfo>();
-            if (Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_ENCODED_MESSAGE, 0, null, ref size))
+            if (Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_ENCODED_MESSAGE, 0, (void*)null, ref size))
             {
                 var buffer = new byte[(int)size];
                 fixed(byte* buf = buffer)
