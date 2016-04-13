@@ -23,6 +23,10 @@ namespace AuthenticodeLint.Rules
                 {
                     chain.ChainPolicy.ExtraStore.AddRange(certificates);
                     chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+                    //The purpose of this check is not to validate the chain, completely.
+                    //The chain is needed so we know which certificate is the root and intermediates so we know which to validate and which not to validate.
+                    //It is possible to have a valid authenticode signature if the certificate is expired but was
+                    //timestamped while it was valid. In this case we still want to successfully build a chain to perform validation.
                     chain.ChainPolicy.VerificationFlags = X509VerificationFlags.IgnoreNotTimeValid;
                     bool success = chain.Build(signature.SignerInfo.Certificate);
                     if (!success)
