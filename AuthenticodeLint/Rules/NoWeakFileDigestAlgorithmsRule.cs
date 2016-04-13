@@ -6,7 +6,7 @@ namespace AuthenticodeLint.Rules
     {
         public int RuleId { get; } = 10002;
 
-        public string RuleName { get; } = "Weak File Digest";
+        public string RuleName { get; } = "No Weak File Digests";
 
         public string ShortDescription { get; } = "Checks for weak file digest algorithms.";
 
