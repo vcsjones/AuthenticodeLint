@@ -11,14 +11,15 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks that the signature uses HTTPS for the publisher's URL.";
 
-        public RuleResult Validate(Graph<SignerInfo> graph, SignatureLoggerBase verboseWriter)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLoggerBase verboseWriter)
         {
             var signatures = graph.VisitAll();
             var result = RuleResult.Pass;
             foreach(var signature in signatures)
             {
+                var signatureInfo = signature.SignerInfo;
                 PublisherInformation info = null;
-                foreach(var attribute in signature.SignedAttributes)
+                foreach(var attribute in signatureInfo.SignedAttributes)
                 {
                     if (attribute.Oid.Value == KnownOids.OpusInfo)
                     {
@@ -29,17 +30,17 @@ namespace AuthenticodeLint.Rules
                 if (info == null)
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signature, "Signature does not have any publisher information.");
+                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have any publisher information.");
                 }
                 if (string.IsNullOrWhiteSpace(info.UrlLink))
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signature, "Signature does not have an accompanying URL.");
+                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying URL.");
                 }
-                if (!info.UrlLink.StartsWith(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+                else if (!info.UrlLink.StartsWith(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signature, $"Signature's publisher information URL \"{info.UrlLink}\" does not use the secure HTTPS scheme.");
+                    verboseWriter.LogSignatureMessage(signatureInfo, $"Signature's publisher information URL \"{info.UrlLink}\" does not use the secure HTTPS scheme.");
                 }
             }
             return result;

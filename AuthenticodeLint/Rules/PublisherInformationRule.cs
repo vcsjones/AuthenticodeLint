@@ -7,18 +7,19 @@ namespace AuthenticodeLint.Rules
     {
         public int RuleId { get; } = 10004;
 
-        public string RuleName { get; } = "Publisher Information Rule";
+        public string RuleName { get; } = "Publisher Information Present";
 
         public string ShortDescription { get; } = "Checks that the signature provided publisher information.";
 
-        public RuleResult Validate(Graph<SignerInfo> graph, SignatureLoggerBase verboseWriter)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLoggerBase verboseWriter)
         {
             var signatures = graph.VisitAll();
             var result = RuleResult.Pass;
-            foreach(var signature in signatures)
+            foreach (var signature in signatures)
             {
+                var signatureInfo = signature.SignerInfo;
                 PublisherInformation info = null;
-                foreach(var attribute in signature.SignedAttributes)
+                foreach (var attribute in signatureInfo.SignedAttributes)
                 {
                     if (attribute.Oid.Value == KnownOids.OpusInfo)
                     {
@@ -29,24 +30,27 @@ namespace AuthenticodeLint.Rules
                 if (info == null)
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signature, "Signature does not have any publisher information.");
+                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have any publisher information.");
                 }
                 if (string.IsNullOrWhiteSpace(info.Description))
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signature, "Signature does not have an accompanying description.");
+                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying description.");
                 }
 
                 if (string.IsNullOrWhiteSpace(info.UrlLink))
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signature, "Signature does not have an accompanying URL.");
+                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying URL.");
                 }
-                Uri uri;
-                if (!Uri.TryCreate(info.UrlLink, UriKind.Absolute, out uri))
+                else
                 {
-                    result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signature, "Signature's accompanying URL is not a valid URI.");
+                    Uri uri;
+                    if (!Uri.TryCreate(info.UrlLink, UriKind.Absolute, out uri))
+                    {
+                        result = RuleResult.Fail;
+                        verboseWriter.LogSignatureMessage(signatureInfo, "Signature's accompanying URL is not a valid URI.");
+                    }
                 }
             }
             return result;

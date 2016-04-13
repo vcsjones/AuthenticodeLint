@@ -11,15 +11,16 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Signatures should have a time stamped counter signer.";
 
-        public unsafe RuleResult Validate(Graph<SignerInfo> graph, SignatureLoggerBase verboseWriter)
+        public unsafe RuleResult Validate(Graph<Signature> graph, SignatureLoggerBase verboseWriter)
         {
             var signatures = graph.VisitAll();
             var pass = true;
             foreach (var signature in signatures)
             {
+                var signatureInfo = signature.SignerInfo;
                 var isSigned = false;
                 var strongSign = false;
-                foreach (var attribute in signature.UnsignedAttributes)
+                foreach (var attribute in signatureInfo.UnsignedAttributes)
                 {
                     SignatureBase timeStampCounterSign = null;
                     if (attribute.Oid.Value == KnownOids.Rfc3161CounterSignature)
@@ -35,7 +36,7 @@ namespace AuthenticodeLint.Rules
                         continue;
                     }
                     isSigned = true;
-                    if (timeStampCounterSign.DigestAlgorithm.Value == signature.DigestAlgorithm.Value)
+                    if (timeStampCounterSign.DigestAlgorithm.Value == signatureInfo.DigestAlgorithm.Value)
                     {
                         strongSign = true;
                         break;
@@ -47,12 +48,12 @@ namespace AuthenticodeLint.Rules
                 }
                 if (!isSigned)
                 {
-                    verboseWriter.LogSignatureMessage(signature, $"Signature is not timestamped.");
+                    verboseWriter.LogSignatureMessage(signatureInfo, $"Signature is not timestamped.");
                     pass = false;
                 }
                 else if (!strongSign)
                 {
-                    verboseWriter.LogSignatureMessage(signature, $"Signature is not timestamped with the expected hash algorithm {signature.DigestAlgorithm.FriendlyName}.");
+                    verboseWriter.LogSignatureMessage(signatureInfo, $"Signature is not timestamped with the expected hash algorithm {signatureInfo.DigestAlgorithm.FriendlyName}.");
                     pass = false;
                 }
             }

@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using AuthenticodeLint.Rules;
-using System.Security.Cryptography.Pkcs;
-using System;
-using System.IO;
 
 namespace AuthenticodeLint
 {
@@ -24,11 +21,12 @@ namespace AuthenticodeLint
                 new NoWeakFileDigestAlgorithmsRule(),
                 new TimestampedRule(),
                 new PublisherInformationPresentRule(),
-                new PublisherInformationUrlHttpsRule()
+                new PublisherInformationUrlHttpsRule(),
+                new SigningCertificateDigestAlgorithmRule()
             };
         }
 
-        public RuleEngineResult RunAllRules(string file, Graph<SignerInfo> signatures, List<IRuleResultCollector> collectors, HashSet<int> suppressedRuleIDs, bool verbose)
+        public RuleEngineResult RunAllRules(string file, Graph<Signature> signatures, List<IRuleResultCollector> collectors, HashSet<int> suppressedRuleIDs, bool verbose)
         {
 
             var rules = GetRules();

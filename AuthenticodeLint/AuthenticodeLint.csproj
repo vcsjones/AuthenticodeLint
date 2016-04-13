@@ -69,7 +69,9 @@
     <Compile Include="Rules\RuleResult.cs" />
     <Compile Include="Rules\Sha1PrimarySignatureRule.cs" />
     <Compile Include="Rules\Sha2SignatureExistsRule.cs" />
+    <Compile Include="Rules\SigningCertificateDigestAlgorithmRule.cs" />
     <Compile Include="Rules\TimestampedRule.cs" />
+    <Compile Include="Signature.cs" />
     <Compile Include="SignatureExtractor.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="SignerInfoExtensions.cs" />

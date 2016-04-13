@@ -9,7 +9,7 @@ namespace AuthenticodeLint
 {
     public class SignatureExtractor
     {
-        public Graph<SignerInfo> Extract(string filePath)
+        public Graph<Signature> Extract(string filePath)
         {
             EncodingType encodingType;
             CryptQueryContentType contentType;
@@ -23,7 +23,7 @@ namespace AuthenticodeLint
                 switch(unchecked((uint)resultCode))
                 {
                     case 0x80092009: //Cannot find request object. There's no signature.
-                        return Graph<SignerInfo>.Empty;
+                        return Graph<Signature>.Empty;
                     default:
                         throw new Win32Exception(resultCode, "Failed to extract signature.");
                 }
@@ -39,7 +39,7 @@ namespace AuthenticodeLint
             }
         }
 
-        private unsafe Graph<SignerInfo> GetSignatures(CryptMsgSafeHandle messageHandle)
+        private unsafe Graph<Signature> GetSignatures(CryptMsgSafeHandle messageHandle)
         {
             uint size = 0;
             var signatures = new List<SignerInfo>();
@@ -58,10 +58,10 @@ namespace AuthenticodeLint
         }
 
 
-        public static Graph<SignerInfo> RecursiveSigner(IList<byte[]> cmsData)
+        public static Graph<Signature> RecursiveSigner(IList<byte[]> cmsData)
         {
             const string nestedSignatureOid = "1.3.6.1.4.1.311.2.4.1";
-            var graphItems = new List<GraphItem<SignerInfo>>();
+            var graphItems = new List<GraphItem<Signature>>();
             foreach (var data in cmsData)
             {
                 var cms = new SignedCms();
@@ -79,10 +79,10 @@ namespace AuthenticodeLint
                             }
                         }
                     }
-                    graphItems.Add(new GraphItem<SignerInfo>(signer, RecursiveSigner(childCms)));
+                    graphItems.Add(new GraphItem<Signature>(new Signature(signer, cms.Certificates), RecursiveSigner(childCms)));
                 }
             }
-            return new Graph<SignerInfo>(graphItems);
+            return new Graph<Signature>(graphItems);
         }
     }
 }
