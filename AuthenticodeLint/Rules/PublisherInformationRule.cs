@@ -42,6 +42,12 @@ namespace AuthenticodeLint.Rules
                     result = RuleResult.Fail;
                     verboseWriter.LogMessage(signature, "Signature does not have an accompanying URL.");
                 }
+                Uri uri;
+                if (!Uri.TryCreate(info.UrlLink, UriKind.Absolute, out uri))
+                {
+                    result = RuleResult.Fail;
+                    verboseWriter.LogMessage(signature, "Signature's accompanying URL is not a valid URI.");
+                }
             }
             return result;
         }
