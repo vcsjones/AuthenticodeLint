@@ -23,6 +23,7 @@ namespace AuthenticodeLint.Rules
                 {
                     chain.ChainPolicy.ExtraStore.AddRange(certificates);
                     chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+                    chain.ChainPolicy.VerificationFlags = X509VerificationFlags.IgnoreNotTimeValid;
                     bool success = chain.Build(signature.SignerInfo.Certificate);
                     if (!success)
                     {
