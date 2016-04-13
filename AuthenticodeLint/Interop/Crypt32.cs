@@ -53,6 +53,20 @@ namespace AuthenticodeLint.Interop
             [param: In, Out, MarshalAs(UnmanagedType.U4)] ref uint pcbStructInfo
         );
 
+        [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptDecodeObjectEx", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern unsafe bool CryptDecodeObjectEx
+        (
+            [param: In, MarshalAs(UnmanagedType.U4)] EncodingType dwCertEncodingType,
+            [param: In, MarshalAs(UnmanagedType.LPStr)] string lpszStructType,
+            [param: In] void* pbEncoded,
+            [param: In, MarshalAs(UnmanagedType.U4)] uint cbEncoded,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptDecodeFlags dwFlags,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr pDecodePara,
+            [param: Out] out LocalBufferSafeHandle pvStructInfo,
+            [param: In, Out, MarshalAs(UnmanagedType.U4)] ref uint pcbStructInfo
+        );
+
         [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptMsgOpenToDecode", SetLastError = true)]
         public static extern unsafe CryptMsgSafeHandle CryptMsgOpenToDecode
         (
@@ -286,20 +300,64 @@ namespace AuthenticodeLint.Interop
     [type: StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     internal struct CMSG_SIGNER_INFO
     {
-        internal uint dwVersion;
-        internal CRYPTOAPI_BLOB Issuer;
-        internal CRYPTOAPI_BLOB SerialNumber;
-        internal CRYPT_ALGORITHM_IDENTIFIER HashAlgorithm;
-        internal CRYPT_ALGORITHM_IDENTIFIER HashEncryptionAlgorithm;
-        internal CRYPTOAPI_BLOB EncryptedHash;
-        internal CRYPT_ATTRIBUTES AuthAttrs;
-        internal CRYPT_ATTRIBUTES UnauthAttrs;
+        public uint dwVersion;
+        public CRYPTOAPI_BLOB Issuer;
+        public CRYPTOAPI_BLOB SerialNumber;
+        public CRYPT_ALGORITHM_IDENTIFIER HashAlgorithm;
+        public CRYPT_ALGORITHM_IDENTIFIER HashEncryptionAlgorithm;
+        public CRYPTOAPI_BLOB EncryptedHash;
+        public CRYPT_ATTRIBUTES AuthAttrs;
+        public CRYPT_ATTRIBUTES UnauthAttrs;
     }
 
     [type: StructLayout(LayoutKind.Sequential)]
     internal struct CRYPT_ATTRIBUTES
     {
-        internal uint cAttr;
-        internal IntPtr rgAttr;
+        public uint cAttr;
+        public IntPtr rgAttr;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential)]
+    internal struct SPC_SP_OPUS_INFO
+    {
+        [field: MarshalAs(UnmanagedType.LPWStr)]
+        public string pwszProgramName;
+
+        public unsafe SPC_LINK* pMoreInfo;
+        public unsafe SPC_LINK* pPublisherInfo;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential)]
+    internal struct SPC_LINK
+    {
+        public SpcLinkChoice dwLinkChoice;
+        public SPC_LINK_UNION linkUnion;
+    }
+
+    [type: StructLayout(LayoutKind.Explicit)]
+    internal struct SPC_LINK_UNION
+    {
+        [field: FieldOffset(0)]
+        public IntPtr pwszUrl;
+
+        [field: FieldOffset(0)]
+        public SPC_SERIALIZED_OBJECT Moniker;
+
+        [field: FieldOffset(0)]
+        public IntPtr pwszFile;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential)]
+    internal struct SPC_SERIALIZED_OBJECT
+    {
+        public unsafe fixed byte ClassId[16];
+        public CRYPTOAPI_BLOB SerializedData;
+    }
+
+    internal enum SpcLinkChoice : uint
+    {
+        SPC_URL_LINK_CHOICE = 1,
+        SPC_MONIKER_LINK_CHOICE = 2,
+        SPC_FILE_LINK_CHOICE = 3
     }
 }

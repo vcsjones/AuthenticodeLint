@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Security.Cryptography.Pkcs;
+﻿using System.Security.Cryptography.Pkcs;
 
 namespace AuthenticodeLint.Rules
 {

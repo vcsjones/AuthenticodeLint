@@ -45,14 +45,14 @@ namespace AuthenticodeLint.Rules
                 {
                     throw new InvalidOperationException("Unexpectedly have a strong signature.");
                 }
-                if (!strongSign)
-                {
-                    verboseWriter.LogMessage(signature, $"Signature is not timestamped with the expected hash algorithm {signature.DigestAlgorithm.FriendlyName}.");
-                    pass = false;
-                }
                 if (!isSigned)
                 {
                     verboseWriter.LogMessage(signature, $"Signature is not timestamped.");
+                    pass = false;
+                }
+                else if (!strongSign)
+                {
+                    verboseWriter.LogMessage(signature, $"Signature is not timestamped with the expected hash algorithm {signature.DigestAlgorithm.FriendlyName}.");
                     pass = false;
                 }
             }

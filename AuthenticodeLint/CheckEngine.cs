@@ -23,6 +23,8 @@ namespace AuthenticodeLint
                 new Sha2SignatureExistsRule(),
                 new NoWeakFileDigestAlgorithmsRule(),
                 new TimestampedRule(),
+                new PublisherInformationPresentRule(),
+                new PublisherInformationUrlHttpsRule()
             };
         }
 
