@@ -52,11 +52,11 @@ namespace AuthenticodeLint
                     else
                     {
                         result = rule.Validate(signatures, verboseWriter);
-                        if (result != RuleResult.Pass)
-                        {
-                            engineResult = RuleEngineResult.NotAllPass;
-                        }
                     }
+                }
+                if (result != RuleResult.Pass)
+                {
+                    engineResult = RuleEngineResult.NotAllPass;
                 }
                 collectors.ForEach(c => c.CollectResult(rule, result, verboseWriter.Messages));
             }
