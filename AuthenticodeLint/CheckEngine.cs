@@ -38,16 +38,24 @@ namespace AuthenticodeLint
             {
                 RuleResult result;
                 var verboseWriter = verbose ? new VerboseSignatureLogger() : SignatureLoggerBase.Null;
-                if (suppressedRuleIDs.Contains(rule.RuleId))
+                if (signatures.Items.Count == 0)
                 {
-                    result = RuleResult.Skip;
+                    result = RuleResult.Fail;
+                    verboseWriter.LogMessage("File is not Authenticode signed.");
                 }
                 else
                 {
-                    result = rule.Validate(signatures, verboseWriter);
-                    if (result != RuleResult.Pass)
+                    if (suppressedRuleIDs.Contains(rule.RuleId))
                     {
-                        engineResult = RuleEngineResult.NotAllPass;
+                        result = RuleResult.Skip;
+                    }
+                    else
+                    {
+                        result = rule.Validate(signatures, verboseWriter);
+                        if (result != RuleResult.Pass)
+                        {
+                            engineResult = RuleEngineResult.NotAllPass;
+                        }
                     }
                 }
                 collectors.ForEach(c => c.CollectResult(rule, result, verboseWriter.Messages));

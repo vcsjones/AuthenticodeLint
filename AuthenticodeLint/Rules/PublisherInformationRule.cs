@@ -29,24 +29,24 @@ namespace AuthenticodeLint.Rules
                 if (info == null)
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogMessage(signature, "Signature does not have any publisher information.");
+                    verboseWriter.LogSignatureMessage(signature, "Signature does not have any publisher information.");
                 }
                 if (string.IsNullOrWhiteSpace(info.Description))
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogMessage(signature, "Signature does not have an accompanying description.");
+                    verboseWriter.LogSignatureMessage(signature, "Signature does not have an accompanying description.");
                 }
 
                 if (string.IsNullOrWhiteSpace(info.UrlLink))
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogMessage(signature, "Signature does not have an accompanying URL.");
+                    verboseWriter.LogSignatureMessage(signature, "Signature does not have an accompanying URL.");
                 }
                 Uri uri;
                 if (!Uri.TryCreate(info.UrlLink, UriKind.Absolute, out uri))
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogMessage(signature, "Signature's accompanying URL is not a valid URI.");
+                    verboseWriter.LogSignatureMessage(signature, "Signature's accompanying URL is not a valid URI.");
                 }
             }
             return result;

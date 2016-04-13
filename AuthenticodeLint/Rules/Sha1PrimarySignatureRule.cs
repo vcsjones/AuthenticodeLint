@@ -23,7 +23,7 @@ namespace AuthenticodeLint.Rules
             }
             if (primary.DigestAlgorithm.Value != KnownOids.SHA1)
             {
-                verboseWriter.LogMessage(primary, $"Expected {nameof(KnownOids.SHA1)} digest algorithm but is {primary.DigestAlgorithm.FriendlyName}.");
+                verboseWriter.LogSignatureMessage(primary, $"Expected {nameof(KnownOids.SHA1)} digest algorithm but is {primary.DigestAlgorithm.FriendlyName}.");
                 return RuleResult.Fail;
             }
             return RuleResult.Pass;

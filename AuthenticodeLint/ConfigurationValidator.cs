@@ -38,7 +38,7 @@ namespace AuthenticodeLint
             {
                 if (!File.Exists(path))
                 {
-                    printer.WriteLine($"The input path ${path} does not exist.");
+                    printer.WriteLine($"The input path {path} does not exist.");
                     success = false;
                 }
             }

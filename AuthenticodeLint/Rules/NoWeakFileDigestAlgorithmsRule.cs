@@ -18,17 +18,17 @@ namespace AuthenticodeLint.Rules
             {
                 if (signature.DigestAlgorithm.Value == KnownOids.MD2)
                 {
-                    verboseWriter.LogMessage(signature, $"Uses the {nameof(KnownOids.MD2)} digest algorithm.");
+                    verboseWriter.LogSignatureMessage(signature, $"Uses the {nameof(KnownOids.MD2)} digest algorithm.");
                     result = RuleResult.Fail;
                 }
                 else if (signature.DigestAlgorithm.Value == KnownOids.MD4)
                 {
-                    verboseWriter.LogMessage(signature, $"Uses the {nameof(KnownOids.MD4)} digest algorithm.");
+                    verboseWriter.LogSignatureMessage(signature, $"Uses the {nameof(KnownOids.MD4)} digest algorithm.");
                     result = RuleResult.Fail;
                 }
                 else if (signature.DigestAlgorithm.Value == KnownOids.MD5)
                 {
-                    verboseWriter.LogMessage(signature, $"Uses the {nameof(KnownOids.MD5)} digest algorithm.");
+                    verboseWriter.LogSignatureMessage(signature, $"Uses the {nameof(KnownOids.MD5)} digest algorithm.");
                     result = RuleResult.Fail;
                 }
             }

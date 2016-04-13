@@ -47,12 +47,12 @@ namespace AuthenticodeLint.Rules
                 }
                 if (!isSigned)
                 {
-                    verboseWriter.LogMessage(signature, $"Signature is not timestamped.");
+                    verboseWriter.LogSignatureMessage(signature, $"Signature is not timestamped.");
                     pass = false;
                 }
                 else if (!strongSign)
                 {
-                    verboseWriter.LogMessage(signature, $"Signature is not timestamped with the expected hash algorithm {signature.DigestAlgorithm.FriendlyName}.");
+                    verboseWriter.LogSignatureMessage(signature, $"Signature is not timestamped with the expected hash algorithm {signature.DigestAlgorithm.FriendlyName}.");
                     pass = false;
                 }
             }

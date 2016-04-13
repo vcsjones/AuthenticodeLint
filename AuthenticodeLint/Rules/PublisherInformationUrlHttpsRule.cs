@@ -29,17 +29,17 @@ namespace AuthenticodeLint.Rules
                 if (info == null)
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogMessage(signature, "Signature does not have any publisher information.");
+                    verboseWriter.LogSignatureMessage(signature, "Signature does not have any publisher information.");
                 }
                 if (string.IsNullOrWhiteSpace(info.UrlLink))
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogMessage(signature, "Signature does not have an accompanying URL.");
+                    verboseWriter.LogSignatureMessage(signature, "Signature does not have an accompanying URL.");
                 }
                 if (!info.UrlLink.StartsWith(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogMessage(signature, $"Signature's publisher information URL \"{info.UrlLink}\" does not use the secure HTTPS scheme.");
+                    verboseWriter.LogSignatureMessage(signature, $"Signature's publisher information URL \"{info.UrlLink}\" does not use the secure HTTPS scheme.");
                 }
             }
             return result;
