@@ -3,6 +3,7 @@
 *.nuget.targets
 bin/
 obj/
+out/
 *.suo
 *.user
 *.vs/
