@@ -11,12 +11,15 @@ namespace AuthenticodeLint
         public bool Quiet { get; }
         public HashSet<int> SuppressErrorIDs { get; }
 
-        public CheckConfiguration(IReadOnlyList<string> inputPaths, string reportPath, bool quiet, HashSet<int> suppressErrorIDs)
+        public bool Verbose { get; }
+
+        public CheckConfiguration(IReadOnlyList<string> inputPaths, string reportPath, bool quiet, HashSet<int> suppressErrorIDs, bool verbose)
         {
             InputPaths = inputPaths;
             ReportPath = reportPath;
             Quiet = quiet;
             SuppressErrorIDs = suppressErrorIDs;
+            Verbose = verbose;
         }
     }
 
@@ -26,6 +29,11 @@ namespace AuthenticodeLint
         public static bool ValidateAndPrint(CheckConfiguration configuration, TextWriter printer)
         {
             bool success = true;
+            if (configuration.Verbose && configuration.Quiet)
+            {
+                printer.WriteLine("Cannot combine verbose and quiet configuration.");
+                success = false;
+            }
             foreach (var path in configuration.InputPaths)
             {
                 if (!File.Exists(path))

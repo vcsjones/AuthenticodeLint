@@ -13,7 +13,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Primary signature should be SHA1.";
 
-        public RuleResult Validate(Graph<SignerInfo> graph)
+        public RuleResult Validate(Graph<SignerInfo> graph, SignatureLoggerBase verboseWriter)
         {
             var primary = graph.Items.SingleOrDefault()?.Node;
             //There are zero signatures.
@@ -21,7 +21,12 @@ namespace AuthenticodeLint.Rules
             {
                 return RuleResult.Fail;
             }
-            return primary.DigestAlgorithm.Value == KnownOids.SHA1 ? RuleResult.Pass : RuleResult.Fail;
+            if (primary.DigestAlgorithm.Value != KnownOids.SHA1)
+            {
+                verboseWriter.LogMessage(primary, $"Expected {nameof(KnownOids.SHA1)} digest algorithm but is {primary.DigestAlgorithm.FriendlyName}.");
+                return RuleResult.Fail;
+            }
+            return RuleResult.Pass;
         }
     }
 }

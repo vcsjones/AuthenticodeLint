@@ -2,6 +2,7 @@
 using AuthenticodeLint.Rules;
 using System.Security.Cryptography.Pkcs;
 using System;
+using System.IO;
 
 namespace AuthenticodeLint
 {
@@ -25,7 +26,7 @@ namespace AuthenticodeLint
             };
         }
 
-        public RuleEngineResult RunAllRules(string file, Graph<SignerInfo> signatures, List<IRuleResultCollector> collectors, HashSet<int> suppressedRuleIDs)
+        public RuleEngineResult RunAllRules(string file, Graph<SignerInfo> signatures, List<IRuleResultCollector> collectors, HashSet<int> suppressedRuleIDs, bool verbose)
         {
 
             var rules = GetRules();
@@ -34,19 +35,20 @@ namespace AuthenticodeLint
             foreach(var rule in rules)
             {
                 RuleResult result;
+                var verboseWriter = verbose ? new VerboseSignatureLogger() : SignatureLoggerBase.Null;
                 if (suppressedRuleIDs.Contains(rule.RuleId))
                 {
                     result = RuleResult.Skip;
                 }
                 else
                 {
-                    result = rule.Validate(signatures);
+                    result = rule.Validate(signatures, verboseWriter);
                     if (result != RuleResult.Pass)
                     {
                         engineResult = RuleEngineResult.NotAllPass;
                     }
                 }
-                collectors.ForEach(c => c.CollectResult(rule, result));
+                collectors.ForEach(c => c.CollectResult(rule, result, verboseWriter.Messages));
             }
             collectors.ForEach(c => c.CompleteSet());
             return engineResult;

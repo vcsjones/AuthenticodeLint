@@ -1,4 +1,6 @@
 ﻿using AuthenticodeLint.Rules;
+using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace AuthenticodeLint
@@ -21,9 +23,13 @@ namespace AuthenticodeLint
             _currentSet = new XElement("file", new XAttribute("path", setName));
         }
 
-        public void CollectResult(IAuthenticodeRule rule, RuleResult result)
+        public void CollectResult(IAuthenticodeRule rule, RuleResult result, IReadOnlyList<string> additionalOutput)
         {
-            _currentSet.Add(new XElement("check", new XAttribute("ruleId", rule.RuleId), new XAttribute("result", result)));
+            var additionalOutputElements = additionalOutput.Select(msg => new XElement("message", msg));
+            _currentSet.Add(new XElement("check",
+                new XAttribute("ruleId", rule.RuleId),
+                new XAttribute("result", result),
+                new XElement("messages", additionalOutputElements.ToArray())));
         }
 
         public void CompleteSet()

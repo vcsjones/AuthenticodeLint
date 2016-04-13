@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.Pkcs;
+﻿using System;
+using System.Security.Cryptography.Pkcs;
 
 namespace AuthenticodeLint.Rules
 {
@@ -10,12 +11,14 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Signatures should have a time stamped counter signer.";
 
-        public unsafe RuleResult Validate(Graph<SignerInfo> graph)
+        public unsafe RuleResult Validate(Graph<SignerInfo> graph, SignatureLoggerBase verboseWriter)
         {
             var signatures = graph.VisitAll();
+            var pass = true;
             foreach (var signature in signatures)
             {
                 var isSigned = false;
+                var strongSign = false;
                 foreach (var attribute in signature.UnsignedAttributes)
                 {
                     SignatureBase timeStampCounterSign = null;
@@ -31,18 +34,29 @@ namespace AuthenticodeLint.Rules
                     {
                         continue;
                     }
+                    isSigned = true;
                     if (timeStampCounterSign.DigestAlgorithm.Value == signature.DigestAlgorithm.Value)
                     {
-                        isSigned = true;
+                        strongSign = true;
                         break;
                     }
                 }
+                if (!isSigned && strongSign)
+                {
+                    throw new InvalidOperationException("Unexpectedly have a strong signature.");
+                }
+                if (!strongSign)
+                {
+                    verboseWriter.LogMessage(signature, $"Signature is not timestamped with the expected hash algorithm {signature.DigestAlgorithm.FriendlyName}.");
+                    pass = false;
+                }
                 if (!isSigned)
                 {
-                    return RuleResult.Fail;
+                    verboseWriter.LogMessage(signature, $"Signature is not timestamped.");
+                    pass = false;
                 }
             }
-            return RuleResult.Pass;
+            return pass ? RuleResult.Pass : RuleResult.Fail;
         }
     }
 }

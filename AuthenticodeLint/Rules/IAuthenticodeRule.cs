@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography.Pkcs;
 
 namespace AuthenticodeLint.Rules
@@ -8,6 +9,6 @@ namespace AuthenticodeLint.Rules
         int RuleId { get; }
         string ShortDescription { get; }
         string RuleName { get; }
-        RuleResult Validate(Graph<SignerInfo> graph);
+        RuleResult Validate(Graph<SignerInfo> graph, SignatureLoggerBase verboseWriter);
     }
 }

@@ -16,9 +16,31 @@ namespace AuthenticodeLint
         }
 
         public Oid DigestAlgorithm => new Oid(_signerInfo.HashAlgorithm.pszObjId);
+        public Oid HashEncryptionAlgorithm => new Oid(_signerInfo.HashEncryptionAlgorithm.pszObjId);
 
-        public virtual void Dispose()
+        public byte[] SerialNumber
         {
+            get
+            {
+                var buffer = new byte[_signerInfo.SerialNumber.cbData];
+                Marshal.Copy(_signerInfo.SerialNumber.pbData, buffer, 0, buffer.Length);
+                return buffer;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public virtual void Dispose(bool disposing)
+        {
+        }
+
+        ~SignatureBase()
+        {
+            Dispose(false);
         }
     }
 
@@ -93,12 +115,14 @@ namespace AuthenticodeLint
                     var size = 0u;
                     if (!Crypt32.CryptMsgGetParam(_messageHandle, CryptMsgParamType.CMSG_SIGNER_INFO_PARAM, 0, LocalBufferSafeHandle.Zero, ref size))
                     {
+                        _messageHandle.Dispose();
                         throw new InvalidOperationException("Unable to read signer information.");
                     }
                     using (var localBuffer = LocalBufferSafeHandle.Alloc(size))
                     {
                         if (!Crypt32.CryptMsgGetParam(_messageHandle, CryptMsgParamType.CMSG_SIGNER_INFO_PARAM, 0, localBuffer, ref size))
                         {
+                            _messageHandle.Dispose();
                             throw new InvalidOperationException("Unable to read signer information.");
                         }
                         _signerInfo = Marshal.PtrToStructure<CMSG_SIGNER_INFO>(localBuffer.DangerousGetHandle());
@@ -112,10 +136,13 @@ namespace AuthenticodeLint
         }
 
 
-        public override void Dispose()
+        public override void Dispose(bool disposing)
         {
-            _messageHandle.Dispose();
-            _certificates.Dispose();
+            if (disposing)
+            {
+                _messageHandle.Dispose();
+                _certificates.Dispose();
+            }
         }
     }
 }

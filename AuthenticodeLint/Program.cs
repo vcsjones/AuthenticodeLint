@@ -22,6 +22,7 @@ namespace AuthenticodeLint
             var inputs = new List<string>();
             var suppress = new HashSet<int>();
             bool quiet = false;
+            bool verbose = false;
             string report = null;
             foreach(var parameter in parsedCommandLine)
             {
@@ -78,6 +79,15 @@ namespace AuthenticodeLint
                     }
                     quiet = true;
                 }
+                else if (parameter.Name == "verbose")
+                {
+                    if (!string.IsNullOrWhiteSpace(parameter.Value))
+                    {
+                        Console.Error.WriteLine($"-{parameter.Value} does not expect a value.");
+                        return ExitCodes.InvalidInputOrConfig;
+                    }
+                    verbose = true;
+                }
                 else if (parameter.Name == "report")
                 {
                     report = parameter.Value;
@@ -93,7 +103,7 @@ namespace AuthenticodeLint
                 Console.Error.WriteLine("Input is expected. See -help for usage.");
                 return ExitCodes.InvalidInputOrConfig;
             }
-            var configuration = new CheckConfiguration(inputs, report, quiet, suppress);
+            var configuration = new CheckConfiguration(inputs, report, quiet, suppress, verbose);
 
             if (!ConfigurationValidator.ValidateAndPrint(configuration, Console.Error))
             {
@@ -113,7 +123,7 @@ namespace AuthenticodeLint
             foreach (var file in inputs)
             {
                 var signatures = extractor.Extract(file);
-                if (CheckEngine.Instance.RunAllRules(file, signatures, collectors, suppress) != RuleEngineResult.AllPass)
+                if (CheckEngine.Instance.RunAllRules(file, signatures, collectors, suppress, verbose) != RuleEngineResult.AllPass)
                 {
                     result = ExitCodes.ChecksFailed;
                 }
@@ -136,6 +146,7 @@ Usage: authlint.exe -in ""C:\path to an\executable.exe""
     -suppress:  A comma separated list of error IDs to ignore. All checks are run if omitted. Optional.
     -q|quiet:   Run quietly and do not print anything to the output. Optional.
     -report:    A path to produce an XML file as a report. Optional.
+    -verbose:   Show verbose output.
 
 Exit codes:
 

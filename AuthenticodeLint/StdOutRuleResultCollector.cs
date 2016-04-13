@@ -1,5 +1,6 @@
 ﻿using AuthenticodeLint.Rules;
 using System;
+using System.Collections.Generic;
 
 namespace AuthenticodeLint
 {
@@ -13,7 +14,7 @@ namespace AuthenticodeLint
             Console.Out.WriteLine($"Start checks for {_setName}.");
         }
 
-        public void CollectResult(IAuthenticodeRule rule, RuleResult result)
+        public void CollectResult(IAuthenticodeRule rule, RuleResult result, IReadOnlyList<string> additionalOutput)
         {
             if (_setName == null)
             {
@@ -31,6 +32,10 @@ namespace AuthenticodeLint
                 case RuleResult.Pass:
                     Console.Out.WriteLine($"\tRule #{rule.RuleId} \"{rule.RuleName}\" passed.");
                     break;
+            }
+            foreach(var message in additionalOutput)
+            {
+                Console.Out.WriteLine("\t\t" + message);
             }
         }
 

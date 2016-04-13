@@ -12,17 +12,29 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks for weak file digest algorithms.";
 
-        public RuleResult Validate(Graph<SignerInfo> graph)
+        public RuleResult Validate(Graph<SignerInfo> graph, SignatureLoggerBase verboseWriter)
         {
             var signatures = graph.VisitAll();
-            if (signatures.Any(s =>
-                s.DigestAlgorithm.Value == KnownOids.MD5 ||
-                s.DigestAlgorithm.Value == KnownOids.MD4 ||
-                s.DigestAlgorithm.Value == KnownOids.MD2))
+            var result = RuleResult.Pass;
+            foreach(var signature in signatures)
             {
-                return RuleResult.Fail;
+                if (signature.DigestAlgorithm.Value == KnownOids.MD2)
+                {
+                    verboseWriter.LogMessage(signature, $"Uses the {nameof(KnownOids.MD2)} digest algorithm.");
+                    result = RuleResult.Fail;
+                }
+                else if (signature.DigestAlgorithm.Value == KnownOids.MD4)
+                {
+                    verboseWriter.LogMessage(signature, $"Uses the {nameof(KnownOids.MD4)} digest algorithm.");
+                    result = RuleResult.Fail;
+                }
+                else if (signature.DigestAlgorithm.Value == KnownOids.MD5)
+                {
+                    verboseWriter.LogMessage(signature, $"Uses the {nameof(KnownOids.MD5)} digest algorithm.");
+                    result = RuleResult.Fail;
+                }
             }
-            return RuleResult.Pass;
+            return result;
         }
     }
 }

@@ -68,7 +68,9 @@
     <Compile Include="Rules\TimestampedRule.cs" />
     <Compile Include="SignatureExtractor.cs" />
     <Compile Include="Graph.cs" />
+    <Compile Include="SignerInfoExtensions.cs" />
     <Compile Include="StdOutRuleResultCollector.cs" />
+    <Compile Include="VerboseSignatureTextWriter.cs" />
     <Compile Include="XmlRuleResultCollector.cs" />
   </ItemGroup>
   <ItemGroup>
