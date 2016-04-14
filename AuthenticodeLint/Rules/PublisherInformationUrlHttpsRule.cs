@@ -11,7 +11,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks that the signature uses HTTPS for the publisher's URL.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLoggerBase verboseWriter)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
         {
             var signatures = graph.VisitAll();
             var result = RuleResult.Pass;

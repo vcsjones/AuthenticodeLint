@@ -8,7 +8,7 @@
 
         public string ShortDescription { get; } = "Checks for weak file digest algorithms.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLoggerBase verboseWriter)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
         {
             var signatures = graph.VisitAll();
             var result = RuleResult.Pass;

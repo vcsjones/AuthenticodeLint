@@ -35,14 +35,14 @@ namespace AuthenticodeLint
                     Description = info.pwszProgramName;
                     if (info.pMoreInfo != null)
                     {
-                        var moreInfo = *info.pMoreInfo;
-                        switch(moreInfo.dwLinkChoice)
+                        var moreInfo = info.pMoreInfo;
+                        switch(moreInfo->dwLinkChoice)
                         {
                             case SpcLinkChoice.SPC_URL_LINK_CHOICE:
-                                UrlLink = Marshal.PtrToStringUni(moreInfo.linkUnion.pwszUrl);
+                                UrlLink = Marshal.PtrToStringUni(moreInfo->linkUnion.pwszUrl);
                                 break;
                             case SpcLinkChoice.SPC_FILE_LINK_CHOICE:
-                                FileLink = Marshal.PtrToStringUni(moreInfo.linkUnion.pwszFile);
+                                FileLink = Marshal.PtrToStringUni(moreInfo->linkUnion.pwszFile);
                                 break;
                         }
                     }

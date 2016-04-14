@@ -10,16 +10,17 @@ namespace AuthenticodeLint
         public string ReportPath { get; }
         public bool Quiet { get; }
         public HashSet<int> SuppressErrorIDs { get; }
-
         public bool Verbose { get; }
+        public RevocationChecking RevocationMode {get;}
 
-        public CheckConfiguration(IReadOnlyList<string> inputPaths, string reportPath, bool quiet, HashSet<int> suppressErrorIDs, bool verbose)
+        public CheckConfiguration(IReadOnlyList<string> inputPaths, string reportPath, bool quiet, HashSet<int> suppressErrorIDs, bool verbose, RevocationChecking revocationMode)
         {
             InputPaths = inputPaths;
             ReportPath = reportPath;
             Quiet = quiet;
             SuppressErrorIDs = suppressErrorIDs;
             Verbose = verbose;
+            RevocationMode = revocationMode;
         }
     }
 

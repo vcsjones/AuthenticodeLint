@@ -11,7 +11,7 @@ namespace AuthenticodeLint
             Items = items;
         }
 
-        public static Graph<T> Empty { get; } = new Graph<T>(new List<GraphItem<T>>());
+        public static Graph<T> Empty { get; } = new Graph<T>(System.Array.Empty<GraphItem<T>>());
 
         public IEnumerable<T> VisitAll()
         {

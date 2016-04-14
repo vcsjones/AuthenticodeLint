@@ -10,6 +10,7 @@ namespace AuthenticodeLint
     {
         internal CMSG_SIGNER_INFO _signerInfo;
 
+
         protected SignatureBase(AsnEncodedData data)
         {
 
@@ -61,7 +62,7 @@ namespace AuthenticodeLint
                 }
                 else
                 {
-                    throw new InvalidOperationException("Failed to read authenticode signature");
+                    throw new InvalidOperationException("Failed to read Authenticode signature");
                 }
             }
         }

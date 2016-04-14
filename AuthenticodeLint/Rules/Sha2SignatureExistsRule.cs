@@ -13,7 +13,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "A SHA2 signature should exist.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLoggerBase verboseWriter)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
         {
             var signatures = graph.VisitAll();
             if (signatures.Any(s =>

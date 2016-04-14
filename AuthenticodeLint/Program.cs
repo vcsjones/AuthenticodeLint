@@ -24,6 +24,7 @@ namespace AuthenticodeLint
             bool quiet = false;
             bool verbose = false;
             string report = null;
+            var revocation = RevocationChecking.None;
             foreach(var parameter in parsedCommandLine)
             {
                 if (parameter.Name == "in")
@@ -74,7 +75,7 @@ namespace AuthenticodeLint
                 {
                     if (!string.IsNullOrWhiteSpace(parameter.Value))
                     {
-                        Console.Error.WriteLine($"-{parameter.Value} does not expect a value.");
+                        Console.Error.WriteLine($"-{parameter.Name} does not expect a value.");
                         return ExitCodes.InvalidInputOrConfig;
                     }
                     quiet = true;
@@ -83,7 +84,7 @@ namespace AuthenticodeLint
                 {
                     if (!string.IsNullOrWhiteSpace(parameter.Value))
                     {
-                        Console.Error.WriteLine($"-{parameter.Value} does not expect a value.");
+                        Console.Error.WriteLine($"-{parameter.Name} does not expect a value.");
                         return ExitCodes.InvalidInputOrConfig;
                     }
                     verbose = true;
@@ -91,6 +92,19 @@ namespace AuthenticodeLint
                 else if (parameter.Name == "report")
                 {
                     report = parameter.Value;
+                }
+                else if (parameter.Name == "revocation")
+                {
+                    if (string.IsNullOrWhiteSpace(parameter.Value))
+                    {
+                        Console.Error.WriteLine($"-{parameter.Name} requires a value if specified.");
+                        return ExitCodes.InvalidInputOrConfig;
+                    }
+                    if (!Enum.TryParse(parameter.Value, true, out revocation))
+                    {
+                        Console.Error.WriteLine($"-{parameter.Value} is an unrecognized revocation mode.");
+                        return ExitCodes.InvalidInputOrConfig;
+                    }
                 }
                 else
                 {
@@ -103,7 +117,7 @@ namespace AuthenticodeLint
                 Console.Error.WriteLine("Input is expected. See -help for usage.");
                 return ExitCodes.InvalidInputOrConfig;
             }
-            var configuration = new CheckConfiguration(inputs, report, quiet, suppress, verbose);
+            var configuration = new CheckConfiguration(inputs, report, quiet, suppress, verbose, revocation);
 
             if (!ConfigurationValidator.ValidateAndPrint(configuration, Console.Error))
             {
@@ -123,7 +137,7 @@ namespace AuthenticodeLint
             foreach (var file in inputs)
             {
                 var signatures = extractor.Extract(file);
-                if (CheckEngine.Instance.RunAllRules(file, signatures, collectors, suppress, verbose) != RuleEngineResult.AllPass)
+                if (CheckEngine.Instance.RunAllRules(file, signatures, collectors, configuration) != RuleEngineResult.AllPass)
                 {
                     result = ExitCodes.ChecksFailed;
                 }
@@ -138,21 +152,22 @@ namespace AuthenticodeLint
         {
             Console.Out.WriteLine(@"Authenticode Linter
 
-Checks the authenticode signature of your binaries.
+Checks the Authenticode signature of your binaries.
 
 Usage: authlint.exe -in ""C:\path to an\executable.exe""
 
-    -in:        A path to an executable, DLL, or MSI to lint. Can be specified multiple times. Supports wildcards. Required.
-    -suppress:  A comma separated list of error IDs to ignore. All checks are run if omitted. Optional.
-    -q|quiet:   Run quietly and do not print anything to the output. Optional.
-    -report:    A path to produce an XML file as a report. Optional.
-    -verbose:   Show verbose output.
+    -in:            A path to an executable, DLL, or MSI to lint. Can be specified multiple times. Supports wildcards. Required.
+    -suppress:      A comma separated list of error IDs to ignore. All checks are run if omitted. Optional.
+    -q|quiet:       Run quietly and do not print anything to the output. Optional.
+    -report:        A path to produce an XML file as a report. Optional.
+    -verbose:       Show verbose output. Cannot be combined with -quiet.
+    -revocation:    Specify how revocation checking is done. Valid values are none, offline, online. None is the default.
 
 Exit codes:
 
     0:      All checks passed for all inputs, excluding any that were suppressed.
     1:      Invalid input or configuration was specified.
-    2:      One or more checks failed, or the file is not authenticode signed.
+    2:      One or more checks failed, or the file is not Authenticode signed.
 ");
         }
     }
@@ -163,5 +178,12 @@ Exit codes:
         public static int InvalidInputOrConfig { get; } = 1;
         public static int ChecksFailed { get; } = 2;
         public static int UnknownResults { get; } = 0xFF;
+    }
+
+    public enum RevocationChecking
+    {
+        None,
+        Offline,
+        Online
     }
 }

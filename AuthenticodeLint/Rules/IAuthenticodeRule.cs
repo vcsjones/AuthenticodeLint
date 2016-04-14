@@ -5,6 +5,6 @@
         int RuleId { get; }
         string ShortDescription { get; }
         string RuleName { get; }
-        RuleResult Validate(Graph<Signature> graph, SignatureLoggerBase verboseWriter);
+        RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file);
     }
 }

@@ -22,20 +22,22 @@ namespace AuthenticodeLint
                 new TimestampedRule(),
                 new PublisherInformationPresentRule(),
                 new PublisherInformationUrlHttpsRule(),
-                new SigningCertificateDigestAlgorithmRule()
+                new SigningCertificateDigestAlgorithmRule(),
+                new TrustedSignatureRule()
             };
         }
 
-        public RuleEngineResult RunAllRules(string file, Graph<Signature> signatures, List<IRuleResultCollector> collectors, HashSet<int> suppressedRuleIDs, bool verbose)
+        public RuleEngineResult RunAllRules(string file, Graph<Signature> signatures, List<IRuleResultCollector> collectors, CheckConfiguration configuration)
         {
-
+            var verbose = configuration.Verbose;
+            var suppressedRuleIDs = configuration.SuppressErrorIDs;
             var rules = GetRules();
             var engineResult = RuleEngineResult.AllPass;
             collectors.ForEach(c => c.BeginSet(file));
             foreach(var rule in rules)
             {
                 RuleResult result;
-                var verboseWriter = verbose ? new VerboseSignatureLogger() : SignatureLoggerBase.Null;
+                var verboseWriter = verbose ? new VerboseSignatureLogger() : SignatureLogger.Null;
                 if (signatures.Items.Count == 0)
                 {
                     result = RuleResult.Fail;
@@ -49,7 +51,7 @@ namespace AuthenticodeLint
                     }
                     else
                     {
-                        result = rule.Validate(signatures, verboseWriter);
+                        result = rule.Validate(signatures, verboseWriter, configuration, file);
                     }
                 }
                 if (result != RuleResult.Pass)

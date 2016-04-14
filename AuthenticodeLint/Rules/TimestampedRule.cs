@@ -11,7 +11,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Signatures should have a time stamped counter signer.";
 
-        public unsafe RuleResult Validate(Graph<Signature> graph, SignatureLoggerBase verboseWriter)
+        public unsafe RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
         {
             var signatures = graph.VisitAll();
             var pass = true;
