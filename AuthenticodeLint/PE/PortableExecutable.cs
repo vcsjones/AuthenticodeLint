@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace AuthenticodeLint.PE
@@ -45,66 +47,65 @@ namespace AuthenticodeLint.PE
                 }
                 IMAGE_FILE_HEADER fileHeader;
                 view.Read(sizeof(uint), out fileHeader);
-                if (fileHeader.Machine == 0x8664)
+                if (fileHeader.Machine == IMAGE_FILE_MACHINE_AMD64)
                 {
                     IMAGE_OPTIONAL_HEADER64 header64;
                     view.Read(sizeof(uint) + Marshal.SizeOf<IMAGE_FILE_HEADER>(), out header64);
                     if (header64.Magic != PE32_64)
                     {
-                        throw new InvalidOperationException("File is x86-64 but has a image type other than PE32+");
+                        throw new InvalidOperationException("File is x86-64 but has a image type other than PE32+.");
                     }
-                    var sections = GetSectionHeaders(dosHeader, fileHeader);
-                    var sectionDictionary = new Dictionary<string, PeSectionHeader>();
-                    for (var i = 0; i < sections.Length; i++)
-                    {
-                        unsafe
-                        {
-                            var section = sections[i];
-                            var name = System.Text.Encoding.ASCII.GetString(section.Name, 8).TrimEnd('\0');
-                            var peSectionHeader = new PeSectionHeader();
-                            peSectionHeader.Size = section.SizeOfRawData;
-                            peSectionHeader.VirtualAddress = section.VirtualAddress;
-                            peSectionHeader.Name = name;
-                            sectionDictionary[name] = peSectionHeader;
-                        }
-                    }
-                    var peHeader = new PeHeader();
-                    peHeader.Sections = sectionDictionary;
+                    var entries = ReadDirectoryEntries(view, sizeof(uint) + Marshal.SizeOf<IMAGE_FILE_HEADER>() + Marshal.SizeOf<IMAGE_OPTIONAL_HEADER64>(), IMAGE_NUMBEROF_DIRECTORY_ENTRIES);
+                    var peHeader = new PeHeader(MachineArchitecture.x8664, entries);
                     return peHeader;
                 }
-                else if (fileHeader.Machine == 4444)
+                else if (fileHeader.Machine == IMAGE_FILE_MACHINE_I386)
                 {
-                    throw new NotImplementedException("32-bit todo");
+                    IMAGE_OPTIONAL_HEADER32 header32;
+                    view.Read(sizeof(uint) + Marshal.SizeOf<IMAGE_FILE_HEADER>(), out header32);
+                    if (header32.Magic != PE32_32)
+                    {
+                        throw new InvalidOperationException("File is x86 but has a image type other than PE32.");
+                    }
+                    var entries = ReadDirectoryEntries(view, sizeof(uint) + Marshal.SizeOf<IMAGE_FILE_HEADER>() + Marshal.SizeOf<IMAGE_OPTIONAL_HEADER32>(), IMAGE_NUMBEROF_DIRECTORY_ENTRIES);
+                    var peHeader = new PeHeader(MachineArchitecture.x86, entries);
+                    return peHeader;
                 }
                 else
                 {
-                    throw new NotSupportedException("architecture is not supported.");
+                    throw new NotSupportedException("Architecture is not supported.");
                 }
             }
         }
 
-        public object ResolveDataDirectories(DosHeader dosHeader)
+        public Stream ReadDataDirectory(ImageDataDirectory directory)
         {
-            var optionalHeaderLocationFromExeFileHeader = sizeof(uint) + Marshal.SizeOf<IMAGE_FILE_HEADER>();
-            var ntheader = dosHeader.ExeFileHeaderAddress + optionalHeaderLocationFromExeFileHeader;
-            using (var view = _file.CreateViewAccessor(optionalHeaderLocationFromExeFileHeader + 144, 0, MemoryMappedFileAccess.Read))
+            if (directory == null)
             {
-                IMAGE_DATA_DIRECTORY structure;
-                view.Read(Marshal.SizeOf<IMAGE_DATA_DIRECTORY>() * 4, out structure);
+                throw new ArgumentNullException(nameof(directory));
             }
-            return null;
+            if (directory.VirtualAddress == 0 || directory.Size == 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(directory), "Directory does not contain data.");
+            }
+            return _file.CreateViewStream(directory.VirtualAddress, directory.Size, MemoryMappedFileAccess.Read);
         }
 
-        private IMAGE_SECTION_HEADER[] GetSectionHeaders(DosHeader dosHeader, IMAGE_FILE_HEADER fileHeader)
+        private static IReadOnlyDictionary<ImageDataDirectoryEntry, ImageDataDirectory> ReadDirectoryEntries(MemoryMappedViewAccessor view, long location, int count)
         {
-            var optionalHeaderLocationFromExeFileHeader = sizeof(uint) + Marshal.SizeOf<IMAGE_FILE_HEADER>();
-            var ntheader = dosHeader.ExeFileHeaderAddress + optionalHeaderLocationFromExeFileHeader;
-            using (var view = _file.CreateViewAccessor(ntheader + fileHeader.SizeOfOptionalHeader, 0, MemoryMappedFileAccess.Read))
+            var dictionary = new Dictionary<ImageDataDirectoryEntry, ImageDataDirectory>();
+            var dataDirectories = new IMAGE_DATA_DIRECTORY[count];
+            view.ReadArray(location, dataDirectories, 0, dataDirectories.Length);
+            for (var i = 0; i < dataDirectories.Length; i++)
             {
-                var sections = new IMAGE_SECTION_HEADER[fileHeader.NumberOfSections];
-                view.ReadArray(0, sections, 0, sections.Length);
-                return sections;
+                var entry = new ImageDataDirectory
+                {
+                    Size = dataDirectories[i].Size,
+                    VirtualAddress = dataDirectories[i].VirtualAddress
+                };
+                dictionary.Add((ImageDataDirectoryEntry)i, entry);
             }
+            return dictionary;
         }
 
         public void Dispose()
@@ -116,6 +117,9 @@ namespace AuthenticodeLint.PE
         private const uint IMAGE_NT_SIGNATURE = 0x4550;
         private const ushort PE32_64 = 0x20b;
         private const ushort PE32_32 = 0x10b;
+        private const int IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16;
+        private const ushort IMAGE_FILE_MACHINE_I386 = 0x014c;
+        private const ushort IMAGE_FILE_MACHINE_AMD64 = 0x8664;
     }
 
     public class DosHeader
@@ -125,14 +129,44 @@ namespace AuthenticodeLint.PE
 
     public class PeHeader
     {
-        public IReadOnlyDictionary<string, PeSectionHeader> Sections { get; set; }
+        public MachineArchitecture Architecture { get; }
+        public IReadOnlyDictionary<ImageDataDirectoryEntry, ImageDataDirectory> DataDirectories { get; }
+
+        public PeHeader(MachineArchitecture architecture, IReadOnlyDictionary<ImageDataDirectoryEntry, ImageDataDirectory> dataDirectories)
+        {
+            DataDirectories = dataDirectories;
+            Architecture = architecture;
+        }
     }
 
-    [type: DebuggerDisplay("{Name}")]
-    public class PeSectionHeader
+    public class ImageDataDirectory
     {
-        public string Name { get; set; }
-        public long Size { get; set; }
         public long VirtualAddress { get; set; }
+        public long Size { get; set; }
+    }
+
+    public enum ImageDataDirectoryEntry
+    {
+        IMAGE_DIRECTORY_ENTRY_EXPORT = 0,
+        IMAGE_DIRECTORY_ENTRY_IMPORT = 1,
+        IMAGE_DIRECTORY_ENTRY_RESOURCE = 2,
+        IMAGE_DIRECTORY_ENTRY_EXCEPTION = 3,
+        IMAGE_DIRECTORY_ENTRY_SECURITY = 4,
+        IMAGE_DIRECTORY_ENTRY_BASERELOC = 5,
+        IMAGE_DIRECTORY_ENTRY_DEBUG = 6,
+        IMAGE_DIRECTORY_ENTRY_ARCHITECTURE = 7,
+        IMAGE_DIRECTORY_ENTRY_GLOBALPTR = 8,
+        IMAGE_DIRECTORY_ENTRY_TLS = 9,
+        IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG = 10,
+        IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT = 11,
+        IMAGE_DIRECTORY_ENTRY_IAT = 12,
+        IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT = 13,
+        IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR = 14,
+    }
+
+    public enum MachineArchitecture
+    {
+        x86,
+        x8664
     }
 }

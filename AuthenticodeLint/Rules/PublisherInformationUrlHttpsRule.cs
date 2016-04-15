@@ -32,15 +32,18 @@ namespace AuthenticodeLint.Rules
                     result = RuleResult.Fail;
                     verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have any publisher information.");
                 }
-                if (string.IsNullOrWhiteSpace(info.UrlLink))
+                else
                 {
-                    result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying URL.");
-                }
-                else if (!info.UrlLink.StartsWith(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
-                {
-                    result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signatureInfo, $"Signature's publisher information URL \"{info.UrlLink}\" does not use the secure HTTPS scheme.");
+                    if (string.IsNullOrWhiteSpace(info.UrlLink))
+                    {
+                        result = RuleResult.Fail;
+                        verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying URL.");
+                    }
+                    else if (!info.UrlLink.StartsWith(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+                    {
+                        result = RuleResult.Fail;
+                        verboseWriter.LogSignatureMessage(signatureInfo, $"Signature's publisher information URL \"{info.UrlLink}\" does not use the secure HTTPS scheme.");
+                    }
                 }
             }
             return result;

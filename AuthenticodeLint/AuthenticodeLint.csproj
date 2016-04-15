@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CertificatePaddingExtractor.cs" />
     <Compile Include="CheckEngine.cs" />
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="ConfigurationValidator.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Rules\SigningCertificateDigestAlgorithmRule.cs" />
     <Compile Include="Rules\TimestampedRule.cs" />
     <Compile Include="Rules\TrustedSignatureRule.cs" />
+    <Compile Include="Rules\WinCertificatePaddingRule.cs" />
     <Compile Include="Signature.cs" />
     <Compile Include="SignatureExtractor.cs" />
     <Compile Include="Graph.cs" />

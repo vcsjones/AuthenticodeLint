@@ -32,24 +32,27 @@ namespace AuthenticodeLint.Rules
                     result = RuleResult.Fail;
                     verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have any publisher information.");
                 }
-                if (string.IsNullOrWhiteSpace(info.Description))
-                {
-                    result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying description.");
-                }
-
-                if (string.IsNullOrWhiteSpace(info.UrlLink))
-                {
-                    result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying URL.");
-                }
                 else
                 {
-                    Uri uri;
-                    if (!Uri.TryCreate(info.UrlLink, UriKind.Absolute, out uri))
+                    if (string.IsNullOrWhiteSpace(info.Description))
                     {
                         result = RuleResult.Fail;
-                        verboseWriter.LogSignatureMessage(signatureInfo, "Signature's accompanying URL is not a valid URI.");
+                        verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying description.");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(info.UrlLink))
+                    {
+                        result = RuleResult.Fail;
+                        verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying URL.");
+                    }
+                    else
+                    {
+                        Uri uri;
+                        if (!Uri.TryCreate(info.UrlLink, UriKind.Absolute, out uri))
+                        {
+                            result = RuleResult.Fail;
+                            verboseWriter.LogSignatureMessage(signatureInfo, "Signature's accompanying URL is not a valid URI.");
+                        }
                     }
                 }
             }

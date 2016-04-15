@@ -39,7 +39,7 @@ namespace AuthenticodeLint.Interop
     }
 
     [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal struct IMAGE_OPTIONAL_HEADER_32
+    internal struct IMAGE_OPTIONAL_HEADER32
     {
         public ushort Magic;
         public byte MajorLinkerVersion;

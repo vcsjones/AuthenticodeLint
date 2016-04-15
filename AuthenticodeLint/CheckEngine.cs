@@ -23,7 +23,8 @@ namespace AuthenticodeLint
                 new PublisherInformationPresentRule(),
                 new PublisherInformationUrlHttpsRule(),
                 new SigningCertificateDigestAlgorithmRule(),
-                new TrustedSignatureRule()
+                new TrustedSignatureRule(),
+                new WinCertificatePaddingRule()
             };
         }
 
