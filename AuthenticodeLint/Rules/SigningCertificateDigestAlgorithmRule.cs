@@ -7,39 +7,72 @@ namespace AuthenticodeLint.Rules
     {
         public override int RuleId { get; } = 10006;
 
-        public override string RuleName { get; } = "SHA2 Certificate Chain";
+        public override string RuleName { get; } = "Strong Certificate Chain";
 
         public override string ShortDescription { get; } = "Checks the signing certificate's and chain's signature algorithm.";
 
         protected override bool ValidateChain(Signature signer, X509Chain chain, SignatureLogger verboseWriter)
         {
-            return ValidateSha2Chain(signer.SignerInfo, chain, verboseWriter);
+            return ValidateStrongChain(signer.SignerInfo, chain, verboseWriter);
         }
 
-        private static bool ValidateSha2Chain(SignerInfo signatureInfo, X509Chain chain, SignatureLogger verboseWriter)
+        private static bool ValidateStrongChain(SignerInfo signatureInfo, X509Chain chain, SignatureLogger verboseWriter)
         {
-            var strongSha2Chain = true;
-            //We use count-1 because we don't want to validate SHA2 on the root certificate.
-            for(var i = 0; i < chain.ChainElements.Count-1; i++)
+            var signatureStrength = GetHashStrenghForComparison(signatureInfo.DigestAlgorithm.Value);
+            var strongShaChain = true;
+            var leafCertificateSignatureAlgorithm = chain.ChainElements[0].Certificate.SignatureAlgorithm;
+            var leafCertificateSignatureAlgorithmStrength = GetHashStrenghForComparison(leafCertificateSignatureAlgorithm.Value);
+            //We use count-1 because we don't want to validate the root certificate.
+            for (var i = 0; i < chain.ChainElements.Count - 1; i++)
             {
                 var element = chain.ChainElements[i];
                 var signatureAlgorithm = element.Certificate.SignatureAlgorithm;
-                switch (signatureAlgorithm.Value)
+                var certificateHashStrength = GetHashStrenghForComparison(signatureAlgorithm.Value);
+                if (certificateHashStrength < signatureStrength)
                 {
-                    case KnownOids.sha256ECDSA:
-                    case KnownOids.sha384ECDSA:
-                    case KnownOids.sha512ECDSA:
-                    case KnownOids.sha256RSA:
-                    case KnownOids.sha384RSA:
-                    case KnownOids.sha512RSA:
-                        continue;
-                    default:
-                        verboseWriter.LogSignatureMessage(signatureInfo, $"Certificate {element.Certificate.Thumbprint} in chain uses {element.Certificate.SignatureAlgorithm.FriendlyName} for its signature algorithm instead of SHA2.");
-                        strongSha2Chain = false;
-                        break;
+                    verboseWriter.LogSignatureMessage(signatureInfo, $"Certificate {element.Certificate.Thumbprint} in chain uses {element.Certificate.SignatureAlgorithm.FriendlyName} for its signature algorithm instead of at least {signatureInfo.DigestAlgorithm.FriendlyName}.");
+                    strongShaChain = false;
+                }
+                //Check that all intermediates are at least as strong as the leaf.
+                else if (certificateHashStrength < leafCertificateSignatureAlgorithmStrength)
+                {
+                    verboseWriter.LogSignatureMessage(signatureInfo, $"Certificate {element.Certificate.Thumbprint} in chain uses {element.Certificate.SignatureAlgorithm.FriendlyName} for its signature algorithm instead of at least {signatureInfo.DigestAlgorithm.FriendlyName}.");
                 }
             }
-            return strongSha2Chain;
+            return strongShaChain;
+        }
+
+        //Returns a value for comparison. These values are not intended to be a bit size, but only used for comparing
+        //angainst other values.
+        private static int GetHashStrenghForComparison(string oid)
+        {
+            switch (oid)
+            {
+                case KnownOids.MD2:
+                    return 2;
+                case KnownOids.MD4:
+                    return 4;
+                case KnownOids.MD5:
+                    return 5;
+                case KnownOids.SHA1:
+                case KnownOids.sha1ECDSA:
+                case KnownOids.sha1RSA:
+                    return 10;
+                case KnownOids.SHA256:
+                case KnownOids.sha256ECDSA:
+                case KnownOids.sha256RSA:
+                    return 256;
+                case KnownOids.SHA384:
+                case KnownOids.sha384ECDSA:
+                case KnownOids.sha384RSA:
+                    return 384;
+                case KnownOids.SHA512:
+                case KnownOids.sha512ECDSA:
+                case KnownOids.sha512RSA:
+                    return 512;
+                default:
+                    return 0;
+            }
         }
     }
 }
