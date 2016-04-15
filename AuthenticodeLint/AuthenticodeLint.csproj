@@ -60,10 +60,12 @@
     <Compile Include="Interop\Crypt32.cs" />
     <Compile Include="Interop\CryptMsgSafeHandle.cs" />
     <Compile Include="Interop\LocalBufferSafeHandle.cs" />
+    <Compile Include="Interop\Pe.cs" />
     <Compile Include="Interop\Wintrust.cs" />
     <Compile Include="IRuleResultCollector.cs" />
     <Compile Include="KnownGuids.cs" />
     <Compile Include="KnownOids.cs" />
+    <Compile Include="PE\PortableExecutable.cs" />
     <Compile Include="PublisherInformation.cs" />
     <Compile Include="Rfc3161Signature.cs" />
     <Compile Include="Rules\IAuthenticodeRule.cs" />
