@@ -24,7 +24,9 @@ namespace AuthenticodeLint
                 new PublisherInformationUrlHttpsRule(),
                 new SigningCertificateDigestAlgorithmRule(),
                 new TrustedSignatureRule(),
-                new WinCertificatePaddingRule()
+                new WinCertificatePaddingRule(),
+                new NoUnknownUnsignedAttibuteRule(),
+                new NoUnknownCertificatesRule()
             };
         }
 

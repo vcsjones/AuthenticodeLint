@@ -69,9 +69,11 @@
     <Compile Include="PE\PortableExecutable.cs" />
     <Compile Include="PublisherInformation.cs" />
     <Compile Include="Rfc3161Signature.cs" />
+    <Compile Include="Rules\CertificateChainRuleBase.cs" />
     <Compile Include="Rules\IAuthenticodeRule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rules\NoUnknownCertificatesRule.cs" />
     <Compile Include="Rules\NoWeakFileDigestAlgorithmsRule.cs" />
     <Compile Include="Rules\PublisherInformationUrlHttpsRule.cs" />
     <Compile Include="Rules\PublisherInformationRule.cs" />
@@ -81,6 +83,7 @@
     <Compile Include="Rules\SigningCertificateDigestAlgorithmRule.cs" />
     <Compile Include="Rules\TimestampedRule.cs" />
     <Compile Include="Rules\TrustedSignatureRule.cs" />
+    <Compile Include="Rules\NoUnknownUnsignedAttibuteRule.cs" />
     <Compile Include="Rules\WinCertificatePaddingRule.cs" />
     <Compile Include="Signature.cs" />
     <Compile Include="SignatureExtractor.cs" />

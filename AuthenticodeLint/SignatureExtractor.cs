@@ -60,7 +60,6 @@ namespace AuthenticodeLint
 
         public static Graph<Signature> RecursiveSigner(IList<byte[]> cmsData)
         {
-            const string nestedSignatureOid = "1.3.6.1.4.1.311.2.4.1";
             var graphItems = new List<GraphItem<Signature>>();
             foreach (var data in cmsData)
             {
@@ -71,7 +70,7 @@ namespace AuthenticodeLint
                     var childCms = new List<byte[]>();
                     foreach (var attribute in signer.UnsignedAttributes)
                     {
-                        if (attribute.Oid.Value == nestedSignatureOid)
+                        if (attribute.Oid.Value == KnownOids.NestedSignatureOid)
                         {
                             foreach (var value in attribute.Values)
                             {

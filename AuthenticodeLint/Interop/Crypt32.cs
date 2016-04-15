@@ -360,4 +360,14 @@ namespace AuthenticodeLint.Interop
         SPC_MONIKER_LINK_CHOICE = 2,
         SPC_FILE_LINK_CHOICE = 3
     }
+
+    [type: StructLayout(LayoutKind.Sequential)]
+    internal struct CERT_CONTEXT
+    {
+        public EncodingType dwCertEncodingType;
+        public IntPtr pbCertEncoded;
+        public uint cbCertEncoded;
+        public IntPtr pCertInfo;
+        public IntPtr hCertStore;
+    }
 }
