@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="CommandLineParsingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rules\PublisherInformationPresentRuleTests.cs" />
     <Compile Include="Rules\TimestampedRuleTests.cs" />
     <Compile Include="Rules\WinCertificatePaddingRuleTests.cs" />
   </ItemGroup>
