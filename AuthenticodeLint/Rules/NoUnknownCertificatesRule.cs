@@ -8,7 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace AuthenticodeLint.Rules
 {
-    public class NoUnknownCertificatesRule : IAuthenticodeRule
+    public class NoUnknownCertificatesRule : IAuthenticodeSignatureRule
     {
         public int RuleId { get; } = 10010;
 
@@ -16,7 +16,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks for unknown embedded certificates.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var result = RuleResult.Pass;
             var signatures = graph.VisitAll();

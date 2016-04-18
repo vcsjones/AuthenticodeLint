@@ -3,7 +3,7 @@ using System.Security.Cryptography.Pkcs;
 
 namespace AuthenticodeLint.Rules
 {
-    public class PublisherInformationUrlHttpsRule : IAuthenticodeRule
+    public class PublisherInformationUrlHttpsRule : IAuthenticodeSignatureRule
     {
         public int RuleId { get; } = 10005;
 
@@ -11,7 +11,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks that the signature uses HTTPS for the publisher's URL.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll();
             var result = RuleResult.Pass;

@@ -2,7 +2,7 @@
 
 namespace AuthenticodeLint.Rules
 {
-    public abstract class CertificateChainRuleBase : IAuthenticodeRule
+    public abstract class CertificateChainRuleBase : IAuthenticodeSignatureRule
     {
         public abstract int RuleId { get; }
         public abstract string RuleName { get; }
@@ -10,7 +10,7 @@ namespace AuthenticodeLint.Rules
 
         protected abstract bool ValidateChain(Signature signer, X509Chain chain, SignatureLogger verboseWriter);
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll();
             var result = RuleResult.Pass;

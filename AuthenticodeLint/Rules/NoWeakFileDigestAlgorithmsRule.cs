@@ -1,6 +1,6 @@
 ﻿namespace AuthenticodeLint.Rules
 {
-    public class NoWeakFileDigestAlgorithmsRule : IAuthenticodeRule
+    public class NoWeakFileDigestAlgorithmsRule : IAuthenticodeSignatureRule
     {
         public int RuleId { get; } = 10002;
 
@@ -8,7 +8,7 @@
 
         public string ShortDescription { get; } = "Checks for weak file digest algorithms.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll();
             var result = RuleResult.Pass;

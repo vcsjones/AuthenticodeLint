@@ -3,7 +3,7 @@ using System.Security.Cryptography.Pkcs;
 
 namespace AuthenticodeLint.Rules
 {
-    public class PublisherInformationPresentRule : IAuthenticodeRule
+    public class PublisherInformationPresentRule : IAuthenticodeSignatureRule
     {
         public int RuleId { get; } = 10004;
 
@@ -11,7 +11,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks that the signature provided publisher information.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll();
             var result = RuleResult.Pass;

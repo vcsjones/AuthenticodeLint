@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace AuthenticodeLint.Rules
 {
-    public class TrustedSignatureRule : IAuthenticodeRule
+    public class TrustedSignatureRule : IAuthenticodeFileRule
     {
         public int RuleId { get; } = 10007;
 
@@ -12,7 +12,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Validates the file has correct signatures.";
 
-        public unsafe RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public unsafe RuleResult Validate(string file, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var pathPtr = Marshal.StringToHGlobalUni(file);
             try

@@ -3,7 +3,7 @@ using System.Security.Cryptography.Pkcs;
 
 namespace AuthenticodeLint.Rules
 {
-    public class TimestampedRule : IAuthenticodeRule
+    public class TimestampedRule : IAuthenticodeSignatureRule
     {
         public int RuleId { get; } = 10003;
 
@@ -11,7 +11,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Signatures should have a time stamped counter signer.";
 
-        public unsafe RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public unsafe RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll();
             var pass = true;

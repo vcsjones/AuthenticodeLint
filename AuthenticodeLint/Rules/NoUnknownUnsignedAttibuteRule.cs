@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace AuthenticodeLint.Rules
 {
-    public class NoUnknownUnsignedAttibuteRule : IAuthenticodeRule
+    public class NoUnknownUnsignedAttibuteRule : IAuthenticodeSignatureRule
     {
         public int RuleId { get; } = 10009;
 
@@ -18,7 +18,7 @@ namespace AuthenticodeLint.Rules
             KnownOids.NestedSignatureOid
         };
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll();
             var result = RuleResult.Pass;
