@@ -25,6 +25,19 @@ namespace AuthenticodeLint.Rules
             foreach(var signature in signatures)
             {
                 var signer = signature.SignerInfo;
+                var counterSignatures = GraphBuilder.WalkCounterSignatures(signature);
+                foreach(var counterSignature in counterSignatures.VisitAll())
+                {
+                    foreach (var attribute in counterSignature.UnsignedAttributes)
+                    {
+                        if (!_trustedUnsignedAttributes.Contains(attribute.Oid.Value))
+                        {
+                            result = RuleResult.Fail;
+                            var displayName = attribute.Oid.FriendlyName ?? "<no friendly name>";
+                            verboseWriter.LogSignatureMessage(signer, $"Signature contains counter signer with unknown unsigned attribute {displayName} ({attribute.Oid.Value}).");
+                        }
+                    }
+                }
                 foreach(var attribute in signer.UnsignedAttributes)
                 {
                     if (!_trustedUnsignedAttributes.Contains(attribute.Oid.Value))
