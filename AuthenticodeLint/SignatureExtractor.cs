@@ -58,7 +58,7 @@ namespace AuthenticodeLint
         }
 
 
-        public static Graph<Signature> RecursiveSigner(IList<byte[]> cmsData)
+        private static Graph<Signature> RecursiveSigner(IList<byte[]> cmsData)
         {
             var graphItems = new List<GraphItem<Signature>>();
             foreach (var data in cmsData)

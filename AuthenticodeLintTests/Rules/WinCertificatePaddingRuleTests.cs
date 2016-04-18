@@ -65,7 +65,6 @@ namespace AuthenticodeLintTests.Rules
             //Rules shouldn't handle non-signed, non-binary content since that validation happens further up.
             var file = "../../inputs/nonbinary.txt";
             var rule = new WinCertificatePaddingRule();
-            var logger = new MemorySignatureLogger();
 
             Assert.Throws<InvalidOperationException>(() => rule.Validate(file, SignatureLogger.Null, Configuration));
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography.Pkcs;
 
 namespace AuthenticodeLint.Rules
 {
@@ -9,7 +8,7 @@ namespace AuthenticodeLint.Rules
 
         public string RuleName { get; } = "Timestamped Rule";
 
-        public string ShortDescription { get; } = "Signatures should have a time stamped counter signer.";
+        public string ShortDescription { get; } = "Signatures should have a timestamp counter signer.";
 
         public unsafe RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
@@ -48,7 +47,7 @@ namespace AuthenticodeLint.Rules
                 }
                 if (!isSigned)
                 {
-                    verboseWriter.LogSignatureMessage(signatureInfo, $"Signature is not timestamped.");
+                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature is not timestamped.");
                     pass = false;
                 }
                 else if (!strongSign)
