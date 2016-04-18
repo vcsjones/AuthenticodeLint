@@ -12,7 +12,7 @@ namespace AuthenticodeLint.Rules
 
         public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var primary = graph.Items.SingleOrDefault()?.Node;
+            var primary = graph.SingleOrDefault()?.Node;
             //There are zero signatures.
             if (primary == null)
             {

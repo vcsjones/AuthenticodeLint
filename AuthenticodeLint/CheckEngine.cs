@@ -35,7 +35,7 @@ namespace AuthenticodeLint
             {
                 RuleResult result;
                 var verboseWriter = verbose ? new MemorySignatureLogger() : SignatureLogger.Null;
-                if (signatures.Items.Count == 0)
+                if (signatures.Count == 0)
                 {
                     result = RuleResult.Fail;
                     verboseWriter.LogMessage("File is not Authenticode signed.");

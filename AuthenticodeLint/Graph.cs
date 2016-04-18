@@ -1,21 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace AuthenticodeLint
 {
-    public class Graph<T>
+    public class Graph<T> : IReadOnlyList<GraphItem<T>>
     {
-        public IReadOnlyCollection<GraphItem<T>> Items { get; }
+        private readonly IReadOnlyList<GraphItem<T>> _items;
 
-        public Graph(IReadOnlyCollection<GraphItem<T>> items)
+        public Graph(IReadOnlyList<GraphItem<T>> items)
         {
-            Items = items;
+            _items = items;
         }
 
-        public static Graph<T> Empty { get; } = new Graph<T>(System.Array.Empty<GraphItem<T>>());
+        public static Graph<T> Empty { get; } = new Graph<T>(Array.Empty<GraphItem<T>>());
+
+        public int Count => _items.Count;
+
+        public GraphItem<T> this[int index] => _items[index];
 
         public IEnumerable<T> VisitAll()
         {
-            foreach(var item in Items)
+            foreach(var item in this)
             {
                 yield return item.Node;
                 foreach(var child in item.Children.VisitAll())
@@ -24,6 +30,11 @@ namespace AuthenticodeLint
                 }
             }
         }
+
+        public IEnumerator<GraphItem<T>> GetEnumerator() => _items.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<GraphItem<T>>)this).GetEnumerator();
+
     }
 
     public class GraphItem<T>
