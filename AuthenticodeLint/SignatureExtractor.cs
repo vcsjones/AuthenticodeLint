@@ -50,38 +50,11 @@ namespace AuthenticodeLint
                 {
                     if (Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_ENCODED_MESSAGE, 0, buf, ref size))
                     {
-                        return RecursiveSigner(new List<byte[]> { buffer });
+                        return GraphBuilder.ExplodeGraph(buffer, KnownOids.NestedSignatureOid);
                     }
                 }
             }
             return null;
-        }
-
-
-        public static Graph<Signature> RecursiveSigner(IList<byte[]> cmsData)
-        {
-            var graphItems = new List<GraphItem<Signature>>();
-            foreach (var data in cmsData)
-            {
-                var cms = new SignedCms();
-                cms.Decode(data);
-                foreach (var signer in cms.SignerInfos)
-                {
-                    var childCms = new List<byte[]>();
-                    foreach (var attribute in signer.UnsignedAttributes)
-                    {
-                        if (attribute.Oid.Value == KnownOids.NestedSignatureOid)
-                        {
-                            foreach (var value in attribute.Values)
-                            {
-                                childCms.Add(value.RawData);
-                            }
-                        }
-                    }
-                    graphItems.Add(new GraphItem<Signature>(new Signature(signer, cms.Certificates), RecursiveSigner(childCms)));
-                }
-            }
-            return new Graph<Signature>(graphItems);
         }
     }
 }

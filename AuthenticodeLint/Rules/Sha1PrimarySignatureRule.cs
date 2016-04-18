@@ -2,7 +2,7 @@
 
 namespace AuthenticodeLint.Rules
 {
-    public class Sha1PrimarySignatureRule : IAuthenticodeRule
+    public class Sha1PrimarySignatureRule : IAuthenticodeSignatureRule
     {
         public int RuleId { get; } = 10000;
 
@@ -10,7 +10,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Primary signature should be SHA1.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var primary = graph.Items.SingleOrDefault()?.Node;
             //There are zero signatures.

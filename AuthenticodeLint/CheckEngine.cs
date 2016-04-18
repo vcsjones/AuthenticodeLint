@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using AuthenticodeLint.Rules;
+using System;
+using System.Linq;
 
 namespace AuthenticodeLint
 {
@@ -14,20 +16,12 @@ namespace AuthenticodeLint
 
         public IReadOnlyList<IAuthenticodeRule> GetRules()
         {
-            return new List<IAuthenticodeRule>
-            {
-                new Sha1PrimarySignatureRule(),
-                new Sha2SignatureExistsRule(),
-                new NoWeakFileDigestAlgorithmsRule(),
-                new TimestampedRule(),
-                new PublisherInformationPresentRule(),
-                new PublisherInformationUrlHttpsRule(),
-                new SigningCertificateDigestAlgorithmRule(),
-                new TrustedSignatureRule(),
-                new WinCertificatePaddingRule(),
-                new NoUnknownUnsignedAttibuteRule(),
-                new NoUnknownCertificatesRule()
-            };
+            return (from type in typeof(IAuthenticodeRule).Assembly.GetExportedTypes()
+                    where typeof(IAuthenticodeRule).IsAssignableFrom(type) && type.GetConstructor(Type.EmptyTypes) != null
+                    let instance = (IAuthenticodeRule)Activator.CreateInstance(type)
+                    orderby instance.RuleId
+                    select instance
+                    ).ToList();
         }
 
         public RuleEngineResult RunAllRules(string file, Graph<Signature> signatures, List<IRuleResultCollector> collectors, CheckConfiguration configuration)
@@ -40,7 +34,7 @@ namespace AuthenticodeLint
             foreach(var rule in rules)
             {
                 RuleResult result;
-                var verboseWriter = verbose ? new VerboseSignatureLogger() : SignatureLogger.Null;
+                var verboseWriter = verbose ? new MemorySignatureLogger() : SignatureLogger.Null;
                 if (signatures.Items.Count == 0)
                 {
                     result = RuleResult.Fail;
@@ -52,9 +46,17 @@ namespace AuthenticodeLint
                     {
                         result = RuleResult.Skip;
                     }
+                    else if (rule is IAuthenticodeFileRule)
+                    {
+                        result = ((IAuthenticodeFileRule)rule).Validate(file, verboseWriter, configuration);
+                    }
+                    else if (rule is IAuthenticodeSignatureRule)
+                    {
+                        result = ((IAuthenticodeSignatureRule)rule).Validate(signatures, verboseWriter, configuration);
+                    }
                     else
                     {
-                        result = rule.Validate(signatures, verboseWriter, configuration, file);
+                        throw new NotSupportedException("Rule type is not supported.");
                     }
                 }
                 if (result != RuleResult.Pass)

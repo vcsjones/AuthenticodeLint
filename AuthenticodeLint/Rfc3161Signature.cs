@@ -6,58 +6,82 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace AuthenticodeLint
 {
-    public abstract class SignatureBase : IDisposable
+    public interface ICounterSignature
     {
-        internal CMSG_SIGNER_INFO _signerInfo;
-
-
-        protected SignatureBase(AsnEncodedData data)
+        Oid Oid { get; }
+        Oid DigestAlgorithm { get; }
+        Oid HashEncryptionAlgorithm { get; }
+        CryptographicAttributeObjectCollection UnsignedAttributes { get; }
+        CryptographicAttributeObjectCollection SignedAttributes { get; }
+    }
+    public abstract class CounterSignatureBase : ICounterSignature
+    {
+        
+        protected CounterSignatureBase(AsnEncodedData data)
         {
-
+            Oid = data.Oid;
         }
 
-        public Oid DigestAlgorithm => new Oid(_signerInfo.HashAlgorithm.pszObjId);
-        public Oid HashEncryptionAlgorithm => new Oid(_signerInfo.HashEncryptionAlgorithm.pszObjId);
+        public Oid Oid { get; }
 
-        public byte[] SerialNumber
+        public abstract Oid DigestAlgorithm { get; }
+        public abstract Oid HashEncryptionAlgorithm { get; }
+        public abstract CryptographicAttributeObjectCollection UnsignedAttributes { get; }
+        public abstract CryptographicAttributeObjectCollection SignedAttributes { get; }
+        public abstract byte[] SerialNumber { get; }
+
+        internal byte[] ReadBlob(CRYPTOAPI_BLOB blob)
         {
-            get
+            var buffer = new byte[blob.cbData];
+            Marshal.Copy(blob.pbData, buffer, 0, buffer.Length);
+            return buffer;
+        }
+
+        internal unsafe CryptographicAttributeObjectCollection ReadAttributes(CRYPT_ATTRIBUTES attributes)
+        {
+            var collection = new CryptographicAttributeObjectCollection();
+            var attributeSize = Marshal.SizeOf<CRYPT_ATTRIBUTE>();
+            var blobSize = Marshal.SizeOf<CRYPTOAPI_BLOB>();
+            for (var i = 0; i < attributes.cAttr; i++)
             {
-                var buffer = new byte[_signerInfo.SerialNumber.cbData];
-                Marshal.Copy(_signerInfo.SerialNumber.pbData, buffer, 0, buffer.Length);
-                return buffer;
+                var structure = Marshal.PtrToStructure<CRYPT_ATTRIBUTE>(attributes.rgAttr + (i * attributeSize));
+                var asnValues = new AsnEncodedDataCollection();
+                for(var j = 0; j < structure.cValue; j++)
+                {
+                    var blob = Marshal.PtrToStructure<CRYPTOAPI_BLOB>(structure.rgValue + j * blobSize);
+                    asnValues.Add(new AsnEncodedData(structure.pszObjId, ReadBlob(blob)));
+                }
+                collection.Add(new CryptographicAttributeObject(new Oid(structure.pszObjId), asnValues));
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public virtual void Dispose(bool disposing)
-        {
-        }
-
-        ~SignatureBase()
-        {
-            Dispose(false);
+            return collection;
         }
     }
 
-    public class AuthenticodeSignature : SignatureBase
+    public class AuthenticodeSignature : CounterSignatureBase
     {
+
+        public override Oid DigestAlgorithm { get; }
+        public override Oid HashEncryptionAlgorithm { get; }
+        public override CryptographicAttributeObjectCollection UnsignedAttributes { get; }
+        public override CryptographicAttributeObjectCollection SignedAttributes { get; }
+        public override byte[] SerialNumber { get; }
+
         public unsafe AuthenticodeSignature(AsnEncodedData data) : base(data)
         {
             fixed (byte* dataPtr = data.RawData)
             {
-                LocalBufferSafeHandle ptr;
                 uint size = 0;
-                if (Crypt32.CryptDecodeObjectEx(EncodingType.PKCS_7_ASN_ENCODING | EncodingType.X509_ASN_ENCODING, (IntPtr)500, new IntPtr(dataPtr), (uint)data.RawData.Length, CryptDecodeFlags.CRYPT_DECODE_ALLOC_FLAG, IntPtr.Zero, out ptr, ref size))
+                LocalBufferSafeHandle localBuffer;
+                if (Crypt32.CryptDecodeObjectEx(EncodingType.PKCS_7_ASN_ENCODING | EncodingType.X509_ASN_ENCODING, (IntPtr)500, new IntPtr(dataPtr), (uint)data.RawData.Length, CryptDecodeFlags.CRYPT_DECODE_ALLOC_FLAG, IntPtr.Zero, out localBuffer, ref size))
                 {
-                    using (ptr)
+                    using (localBuffer)
                     {
-                        _signerInfo = Marshal.PtrToStructure<CMSG_SIGNER_INFO>(ptr.DangerousGetHandle());
+                        var signerInfo = Marshal.PtrToStructure<CMSG_SIGNER_INFO>(localBuffer.DangerousGetHandle());
+                        DigestAlgorithm = new Oid(signerInfo.HashAlgorithm.pszObjId);
+                        HashEncryptionAlgorithm = new Oid(signerInfo.HashEncryptionAlgorithm.pszObjId);
+                        SerialNumber = ReadBlob(signerInfo.SerialNumber);
+                        UnsignedAttributes = ReadAttributes(signerInfo.UnauthAttrs);
+                        SignedAttributes = ReadAttributes(signerInfo.AuthAttrs);
                     }
                 }
                 else
@@ -68,10 +92,14 @@ namespace AuthenticodeLint
         }
     }
 
-    public class Rfc3161Signature : SignatureBase
+    public class Rfc3161Signature : CounterSignatureBase
     {
-        private readonly X509Store _certificates;
-        private readonly CryptMsgSafeHandle _messageHandle;
+        public override Oid DigestAlgorithm { get; }
+        public override Oid HashEncryptionAlgorithm { get; }
+        public override CryptographicAttributeObjectCollection UnsignedAttributes { get; }
+        public override CryptographicAttributeObjectCollection SignedAttributes { get; }
+        public override byte[] SerialNumber { get; }
+        public X509Store Certificates { get; }
 
         public unsafe Rfc3161Signature(AsnEncodedData data) : base(data)
         {
@@ -111,38 +139,35 @@ namespace AuthenticodeLint
                 }
                 try
                 {
-                    _certificates = new X509Store(store.DangerousGetHandle());
-                    _messageHandle = msgHandle;
+                    Certificates = new X509Store(store.DangerousGetHandle());
                     var size = 0u;
-                    if (!Crypt32.CryptMsgGetParam(_messageHandle, CryptMsgParamType.CMSG_SIGNER_INFO_PARAM, 0, LocalBufferSafeHandle.Zero, ref size))
+                    if (!Crypt32.CryptMsgGetParam(msgHandle, CryptMsgParamType.CMSG_SIGNER_INFO_PARAM, 0, LocalBufferSafeHandle.Zero, ref size))
                     {
-                        _messageHandle.Dispose();
+                        Certificates.Dispose();
                         throw new InvalidOperationException("Unable to read signer information.");
                     }
-                    using (var localBuffer = LocalBufferSafeHandle.Alloc(size))
+                    var localBuffer = LocalBufferSafeHandle.Alloc(size);
+                    if (!Crypt32.CryptMsgGetParam(msgHandle, CryptMsgParamType.CMSG_SIGNER_INFO_PARAM, 0, localBuffer, ref size))
                     {
-                        if (!Crypt32.CryptMsgGetParam(_messageHandle, CryptMsgParamType.CMSG_SIGNER_INFO_PARAM, 0, localBuffer, ref size))
-                        {
-                            _messageHandle.Dispose();
-                            throw new InvalidOperationException("Unable to read signer information.");
-                        }
-                        _signerInfo = Marshal.PtrToStructure<CMSG_SIGNER_INFO>(localBuffer.DangerousGetHandle());
+                        Certificates.Dispose();
+                        localBuffer.Dispose();
+                        throw new InvalidOperationException("Unable to read signer information.");
+                    }
+                    using (localBuffer)
+                    {
+                        var signerInfo = Marshal.PtrToStructure<CMSG_SIGNER_INFO>(localBuffer.DangerousGetHandle());
+                        DigestAlgorithm = new Oid(signerInfo.HashAlgorithm.pszObjId);
+                        HashEncryptionAlgorithm = new Oid(signerInfo.HashEncryptionAlgorithm.pszObjId);
+                        SerialNumber = ReadBlob(signerInfo.SerialNumber);
+                        UnsignedAttributes = ReadAttributes(signerInfo.UnauthAttrs);
+                        SignedAttributes = ReadAttributes(signerInfo.AuthAttrs);
                     }
                 }
                 finally
                 {
+                    msgHandle.Dispose();
                     store.Dispose();
                 }
-            }
-        }
-
-
-        public override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _messageHandle.Dispose();
-                _certificates.Dispose();
             }
         }
     }

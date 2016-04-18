@@ -5,7 +5,7 @@ using System.Security.Cryptography.Pkcs;
 
 namespace AuthenticodeLint.Rules
 {
-    public class Sha2SignatureExistsRule : IAuthenticodeRule
+    public class Sha2SignatureExistsRule : IAuthenticodeSignatureRule
     {
         public int RuleId { get; } = 10001;
 
@@ -13,7 +13,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "A SHA2 signature should exist.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll();
             if (signatures.Any(s =>

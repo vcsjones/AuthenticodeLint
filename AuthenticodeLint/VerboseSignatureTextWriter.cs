@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace AuthenticodeLint
 {
-    public class VerboseSignatureLogger : SignatureLogger
+    public class MemorySignatureLogger : SignatureLogger
     {
         public override void LogMessage(string message) => Messages.Add(message);
 
@@ -34,7 +34,7 @@ namespace AuthenticodeLint
     {
         public static SignatureLogger Null { get; } = new NullSignatureLogger();
 
-        internal List<string> Messages { get; } = new List<string>();
+        public List<string> Messages { get; } = new List<string>();
 
         public abstract void LogSignatureMessage(SignerInfo signature, string message);
         public abstract void LogMessage(string message);

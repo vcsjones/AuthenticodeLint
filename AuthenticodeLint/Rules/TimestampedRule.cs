@@ -1,42 +1,30 @@
 ﻿using System;
-using System.Security.Cryptography.Pkcs;
 
 namespace AuthenticodeLint.Rules
 {
-    public class TimestampedRule : IAuthenticodeRule
+    public class TimestampedRule : IAuthenticodeSignatureRule
     {
         public int RuleId { get; } = 10003;
 
         public string RuleName { get; } = "Timestamped Rule";
 
-        public string ShortDescription { get; } = "Signatures should have a time stamped counter signer.";
+        public string ShortDescription { get; } = "Signatures should have a timestamp counter signer.";
 
-        public unsafe RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file)
+        public unsafe RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll();
             var pass = true;
             foreach (var signature in signatures)
             {
+                var counterSignaturesGraph = GraphBuilder.WalkCounterSignatures(signature);
                 var signatureInfo = signature.SignerInfo;
+                var counterSignatures = counterSignaturesGraph.VisitAll();
                 var isSigned = false;
                 var strongSign = false;
-                foreach (var attribute in signatureInfo.UnsignedAttributes)
+                foreach (var counterSignature in counterSignatures)
                 {
-                    SignatureBase timeStampCounterSign = null;
-                    if (attribute.Oid.Value == KnownOids.Rfc3161CounterSignature)
-                    {
-                        timeStampCounterSign = new Rfc3161Signature(attribute.Values[0]);
-                    }
-                    else if (attribute.Oid.Value == KnownOids.AuthenticodeCounterSignature)
-                    {
-                        timeStampCounterSign = new AuthenticodeSignature(attribute.Values[0]);
-                    }
-                    if (timeStampCounterSign == null)
-                    {
-                        continue;
-                    }
                     isSigned = true;
-                    if (timeStampCounterSign.DigestAlgorithm.Value == signatureInfo.DigestAlgorithm.Value)
+                    if (counterSignature.DigestAlgorithm.Value == signatureInfo.DigestAlgorithm.Value)
                     {
                         strongSign = true;
                         break;
@@ -48,7 +36,7 @@ namespace AuthenticodeLint.Rules
                 }
                 if (!isSigned)
                 {
-                    verboseWriter.LogSignatureMessage(signatureInfo, $"Signature is not timestamped.");
+                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature is not timestamped.");
                     pass = false;
                 }
                 else if (!strongSign)

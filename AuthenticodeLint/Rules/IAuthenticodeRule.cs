@@ -5,6 +5,15 @@
         int RuleId { get; }
         string ShortDescription { get; }
         string RuleName { get; }
-        RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration, string file);
+    }
+
+    public interface IAuthenticodeSignatureRule : IAuthenticodeRule
+    {
+        RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration);
+    }
+
+    public interface IAuthenticodeFileRule : IAuthenticodeRule
+    {
+        RuleResult Validate(string file, SignatureLogger verboseWriter, CheckConfiguration configuration);
     }
 }

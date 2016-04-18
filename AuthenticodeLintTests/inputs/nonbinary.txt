@@ -1,0 +1,1 @@
+this is not a binary. Things should handle this case gracefully. No explosions.
