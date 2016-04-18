@@ -297,7 +297,7 @@ namespace AuthenticodeLint.Interop
         public CRYPTOAPI_BLOB Parameters;
     }
 
-    [type: StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [type: StructLayout(LayoutKind.Sequential)]
     internal struct CMSG_SIGNER_INFO
     {
         public uint dwVersion;
@@ -369,5 +369,13 @@ namespace AuthenticodeLint.Interop
         public uint cbCertEncoded;
         public IntPtr pCertInfo;
         public IntPtr hCertStore;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    internal struct CRYPT_ATTRIBUTE
+    {
+        public string pszObjId;
+        public uint cValue;
+        public IntPtr rgValue;
     }
 }

@@ -16,26 +16,15 @@ namespace AuthenticodeLint.Rules
             var pass = true;
             foreach (var signature in signatures)
             {
+                var counterSignaturesGraph = GraphBuilder.WalkCounterSignatures(signature);
                 var signatureInfo = signature.SignerInfo;
+                var counterSignatures = counterSignaturesGraph.VisitAll();
                 var isSigned = false;
                 var strongSign = false;
-                foreach (var attribute in signatureInfo.UnsignedAttributes)
+                foreach (var counterSignature in counterSignatures)
                 {
-                    SignatureBase timeStampCounterSign = null;
-                    if (attribute.Oid.Value == KnownOids.Rfc3161CounterSignature)
-                    {
-                        timeStampCounterSign = new Rfc3161Signature(attribute.Values[0]);
-                    }
-                    else if (attribute.Oid.Value == KnownOids.AuthenticodeCounterSignature)
-                    {
-                        timeStampCounterSign = new AuthenticodeSignature(attribute.Values[0]);
-                    }
-                    if (timeStampCounterSign == null)
-                    {
-                        continue;
-                    }
                     isSigned = true;
-                    if (timeStampCounterSign.DigestAlgorithm.Value == signatureInfo.DigestAlgorithm.Value)
+                    if (counterSignature.DigestAlgorithm.Value == signatureInfo.DigestAlgorithm.Value)
                     {
                         strongSign = true;
                         break;
