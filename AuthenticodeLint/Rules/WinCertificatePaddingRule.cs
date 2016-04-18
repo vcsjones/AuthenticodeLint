@@ -14,7 +14,7 @@ namespace AuthenticodeLint.Rules
         public RuleResult Validate(string file, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var padding = CertificatePaddingExtractor.ExtractPadding(file);
-            if (padding?.Any(p => p != 0) ?? false)
+            if (padding?.Any(p => p != 0) == true)
             {
                 verboseWriter.LogMessage($"Non-zero data found after PKCS#7 structure: {Convert.ToBase64String(padding)}.");
                 return RuleResult.Fail;

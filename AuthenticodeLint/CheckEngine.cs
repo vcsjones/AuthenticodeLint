@@ -34,7 +34,7 @@ namespace AuthenticodeLint
             foreach(var rule in rules)
             {
                 RuleResult result;
-                var verboseWriter = verbose ? new VerboseSignatureLogger() : SignatureLogger.Null;
+                var verboseWriter = verbose ? new MemorySignatureLogger() : SignatureLogger.Null;
                 if (signatures.Items.Count == 0)
                 {
                     result = RuleResult.Fail;
