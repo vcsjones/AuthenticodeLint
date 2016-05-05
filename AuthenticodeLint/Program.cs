@@ -24,6 +24,7 @@ namespace AuthenticodeLint
             bool quiet = false;
             bool verbose = false;
             string report = null;
+            string extract = null;
             var revocation = RevocationChecking.None;
             foreach(var parameter in parsedCommandLine)
             {
@@ -89,9 +90,14 @@ namespace AuthenticodeLint
                     }
                     verbose = true;
                 }
+
                 else if (parameter.Name == "report")
                 {
                     report = parameter.Value;
+                }
+                else if (parameter.Name == "extract")
+                {
+                    extract = parameter.Value;
                 }
                 else if (parameter.Name == "revocation")
                 {
@@ -117,7 +123,7 @@ namespace AuthenticodeLint
                 Console.Error.WriteLine("Input is expected. See -help for usage.");
                 return ExitCodes.InvalidInputOrConfig;
             }
-            var configuration = new CheckConfiguration(inputs, report, quiet, suppress, verbose, revocation);
+            var configuration = new CheckConfiguration(inputs, report, quiet, suppress, verbose, revocation, extract);
 
             if (!ConfigurationValidator.ValidateAndPrint(configuration, Console.Error))
             {
@@ -162,6 +168,7 @@ Usage: authlint.exe -in ""C:\path to an\executable.exe""
     -report:        A path to produce an XML file as a report. Optional.
     -verbose:       Show verbose output. Cannot be combined with -quiet.
     -revocation:    Specify how revocation checking is done. Valid values are none, offline, online. None is the default.
+    -extract:       Extracts all signature information to the specified directory.
 
 Exit codes:
 

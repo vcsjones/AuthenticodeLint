@@ -12,8 +12,9 @@ namespace AuthenticodeLint
         public HashSet<int> SuppressErrorIDs { get; }
         public bool Verbose { get; }
         public RevocationChecking RevocationMode {get;}
+        public string ExtractPath { get; }
 
-        public CheckConfiguration(IReadOnlyList<string> inputPaths, string reportPath, bool quiet, HashSet<int> suppressErrorIDs, bool verbose, RevocationChecking revocationMode)
+        public CheckConfiguration(IReadOnlyList<string> inputPaths, string reportPath, bool quiet, HashSet<int> suppressErrorIDs, bool verbose, RevocationChecking revocationMode, string extract)
         {
             InputPaths = inputPaths;
             ReportPath = reportPath;
@@ -21,6 +22,7 @@ namespace AuthenticodeLint
             SuppressErrorIDs = suppressErrorIDs;
             Verbose = verbose;
             RevocationMode = revocationMode;
+            ExtractPath = extract;
         }
     }
 
@@ -50,6 +52,13 @@ namespace AuthenticodeLint
                 {
                     printer.WriteLine($"Error {suppression} is not a valid ID.");
                     success = false;
+                }
+            }
+            if (configuration.ExtractPath != null)
+            {
+                if (!Directory.Exists(configuration.ExtractPath))
+                {
+                    printer.WriteLine($"Directory {configuration.ExtractPath} does not exist.");
                 }
             }
             return success;

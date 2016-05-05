@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace AuthenticodeLint.Rules
 {
@@ -20,11 +21,11 @@ namespace AuthenticodeLint.Rules
         {
             var result = RuleResult.Pass;
             var signatures = graph.VisitAll();
-            foreach(var signature in signatures)
+            foreach (var signature in signatures)
             {
                 var allEmbeddedCertificates = signature.AdditionalCertificates.Cast<X509Certificate2>().ToList();
                 var certificatesRequiringEliminiation = new HashSet<X509Certificate2>(allEmbeddedCertificates, new CertificateThumbprintComparer());
-                foreach(var certificate in allEmbeddedCertificates)
+                foreach (var certificate in allEmbeddedCertificates)
                 {
                     if (!certificatesRequiringEliminiation.Contains(certificate))
                     {
@@ -38,7 +39,7 @@ namespace AuthenticodeLint.Rules
                         chain.ChainPolicy.RevocationFlag = X509RevocationFlag.EntireChain;
                         //All we care is that we can even find an authority.
                         chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllFlags & ~X509VerificationFlags.AllowUnknownCertificateAuthority;
-                        if(chain.Build(certificate))
+                        if (chain.Build(certificate))
                         {
                             certificatesRequiringEliminiation.ExceptWith(chain.ChainElements.Cast<X509ChainElement>().Select(c => c.Certificate));
                         }
@@ -46,7 +47,7 @@ namespace AuthenticodeLint.Rules
                 }
                 if (certificatesRequiringEliminiation.Count > 0)
                 {
-                    foreach(var certificate in certificatesRequiringEliminiation)
+                    foreach (var certificate in certificatesRequiringEliminiation)
                     {
                         verboseWriter.LogSignatureMessage(signature.SignerInfo, $"Signature contained untrusted certificate \"{certificate.Subject}\" ({certificate.Thumbprint}).");
                     }

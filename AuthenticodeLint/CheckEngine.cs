@@ -65,6 +65,10 @@ namespace AuthenticodeLint
                 }
                 collectors.ForEach(c => c.CollectResult(rule, result, verboseWriter.Messages));
             }
+            if (configuration.ExtractPath != null)
+            {
+                Extraction.ExtractToDisk(file, configuration, signatures);
+            }
             collectors.ForEach(c => c.CompleteSet());
             return engineResult;
         }

@@ -8,7 +8,7 @@ namespace AuthenticodeLintTests.Rules
 {
     public class WinCertificatePaddingRuleTests
     {
-        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None);
+        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null);
 
         [Fact]
         public void PaddedExecutableShouldFail()

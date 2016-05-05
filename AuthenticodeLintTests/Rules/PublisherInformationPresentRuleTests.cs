@@ -7,7 +7,7 @@ namespace AuthenticodeLintTests.Rules
 {
     public class PublisherInformationPresentRuleTests
     {
-        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None);
+        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null);
 
         private static Graph<Signature> GetGraphForFile(string file)
         {

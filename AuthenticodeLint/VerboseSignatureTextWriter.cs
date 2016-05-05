@@ -13,8 +13,7 @@ namespace AuthenticodeLint
 
         public override void LogSignatureMessage(SignerInfo signature, string message)
         {
-            var digest = signature.SignatureDigest();
-            var digestString = digest.Aggregate(new StringBuilder(), (acc, b) => acc.AppendFormat("{0:x2}", b)).ToString();
+            var digestString = HashHelpers.GetHashForSignature(signature);
             Messages.Add($"Signature {digestString}: {message}");
         }
     }

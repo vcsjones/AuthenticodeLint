@@ -57,6 +57,7 @@
     <Compile Include="CheckEngine.cs" />
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="ConfigurationValidator.cs" />
+    <Compile Include="Extraction.cs" />
     <Compile Include="GraphBuilders.cs" />
     <Compile Include="Interop\CertStoreSafeHandle.cs" />
     <Compile Include="Interop\Crypt32.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="Signature.cs" />
     <Compile Include="SignatureExtractor.cs" />
     <Compile Include="Graph.cs" />
+    <Compile Include="SignatureHasher.cs" />
     <Compile Include="SignerInfoExtensions.cs" />
     <Compile Include="StdOutRuleResultCollector.cs" />
     <Compile Include="VerboseSignatureTextWriter.cs" />
