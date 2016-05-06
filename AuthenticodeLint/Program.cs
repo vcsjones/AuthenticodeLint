@@ -9,10 +9,20 @@ namespace AuthenticodeLint
     {
         static int Main(string[] args)
         {
+
             var commandLineRaw = string.Join(" ", args);
-            var commandLine = CommandLineParser.LexCommandLine(commandLineRaw);
-            var parsedCommandLine = CommandLineParser.CreateCommandLineParametersWithValues(commandLine).ToList();
-            if (parsedCommandLine.Count == 0 || parsedCommandLine.Any(cl => cl.Name == "help"))
+            List<CommandLineParameter> parsedCommandLine;
+            try
+            {
+                var commandLine = CommandLineParser.LexCommandLine(commandLineRaw);
+                parsedCommandLine = CommandLineParser.CreateCommandLineParametersWithValues(commandLine).ToList();
+            }
+            catch(InvalidOperationException)
+            {
+                parsedCommandLine = null;
+            }
+
+            if (parsedCommandLine == null || parsedCommandLine.Count == 0 || parsedCommandLine.Any(cl => cl.Name == "help"))
             {
                 ShowHelp();
                 //Avoid returning success for printing help so that automated build systems do not interpret "show the help"
