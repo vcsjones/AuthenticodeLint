@@ -35,7 +35,7 @@ namespace AuthenticodeLint
                 {
                     if (token.Length < 2 || token[0] != '-')
                     {
-                        throw new InvalidOperationException("Exepecting a named parameter.");
+                        throw new InvalidOperationException("Expecting a named parameter.");
                     }
                     parameterName = token.Substring(1);
                 }
