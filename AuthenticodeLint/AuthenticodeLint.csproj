@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitStrengthCalculator.cs" />
     <Compile Include="CertificatePaddingExtractor.cs" />
     <Compile Include="CheckEngine.cs" />
     <Compile Include="CommandLineParser.cs" />
@@ -68,9 +69,11 @@
     <Compile Include="IRuleResultCollector.cs" />
     <Compile Include="KnownGuids.cs" />
     <Compile Include="KnownOids.cs" />
+    <Compile Include="OidParser.cs" />
     <Compile Include="PE\PortableExecutable.cs" />
     <Compile Include="PublisherInformation.cs" />
     <Compile Include="Rfc3161Signature.cs" />
+    <Compile Include="Rules\10011-StrongKeyLengthRule.cs" />
     <Compile Include="Rules\CertificateChainRuleBase.cs" />
     <Compile Include="Rules\IAuthenticodeRule.cs" />
     <Compile Include="Program.cs" />
