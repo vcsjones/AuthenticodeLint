@@ -74,6 +74,7 @@
     <Compile Include="PublisherInformation.cs" />
     <Compile Include="Rfc3161Signature.cs" />
     <Compile Include="Rules\10011-StrongKeyLengthRule.cs" />
+    <Compile Include="Rules\10012-RsaDsaPrimarySignatureRule.cs" />
     <Compile Include="Rules\CertificateChainRuleBase.cs" />
     <Compile Include="Rules\IAuthenticodeRule.cs" />
     <Compile Include="Program.cs" />
