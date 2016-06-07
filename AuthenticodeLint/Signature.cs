@@ -115,7 +115,40 @@ namespace AuthenticodeLint
             return certs;
         }
 
-        public abstract IReadOnlyList<ISignature> GetNestedSignatures();
+        public IReadOnlyList<ISignature> GetNestedSignatures()
+        {
+            var list = new List<ISignature>();
+            foreach (var attribute in UnsignedAttributes)
+            {
+                foreach (var value in attribute.Values)
+                {
+                    ISignature signature;
+                    if (attribute.Oid.Value == KnownOids.AuthenticodeCounterSignature)
+                    {
+                        signature = new AuthenticodeSignature(value);
+                    }
+                    else if (attribute.Oid.Value == KnownOids.Rfc3161CounterSignature)
+                    {
+                        signature = new Signature(value, SignatureKind.Rfc3161Signature);
+                    }
+                    else if (attribute.Oid.Value == KnownOids.NestedSignatureOid)
+                    {
+                        signature = new Signature(value, SignatureKind.NestedSignature);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                    var childAttributes = new CryptographicAttributeObjectCollection();
+                    foreach (var childAttribute in signature.UnsignedAttributes)
+                    {
+                        childAttributes.Add(childAttribute);
+                    }
+                    list.Add(signature);
+                }
+            }
+            return list.AsReadOnly();
+        }
     }
 
     public class AuthenticodeSignature : SignatureBase
@@ -163,11 +196,6 @@ namespace AuthenticodeLint
                     throw new InvalidOperationException("Failed to read Authenticode signature");
                 }
             }
-        }
-
-        public override IReadOnlyList<ISignature> GetNestedSignatures()
-        {
-            return new List<ISignature>().AsReadOnly();
         }
     }
 
@@ -255,41 +283,6 @@ namespace AuthenticodeLint
                     InitFromHandles(msgHandle, signerHandle);
                 }
             }
-        }
-
-        public override IReadOnlyList<ISignature> GetNestedSignatures()
-        {
-            var list = new List<ISignature>();
-            foreach (var attribute in UnsignedAttributes)
-            {
-                foreach (var value in attribute.Values)
-                {
-                    ISignature signature;
-                    if (attribute.Oid.Value == KnownOids.AuthenticodeCounterSignature)
-                    {
-                        signature = new AuthenticodeSignature(value);
-                    }
-                    else if (attribute.Oid.Value == KnownOids.Rfc3161CounterSignature)
-                    {
-                        signature = new Signature(value, SignatureKind.Rfc3161Signature);
-                    }
-                    else if (attribute.Oid.Value == KnownOids.NestedSignatureOid)
-                    {
-                        signature = new Signature(value, SignatureKind.NestedSignature);
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                    var childAttributes = new CryptographicAttributeObjectCollection();
-                    foreach (var childAttribute in signature.UnsignedAttributes)
-                    {
-                        childAttributes.Add(childAttribute);
-                    }
-                    list.Add(signature);
-                }
-            }
-            return list.AsReadOnly();
         }
     }
 
