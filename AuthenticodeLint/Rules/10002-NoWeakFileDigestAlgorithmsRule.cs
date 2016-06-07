@@ -16,20 +16,19 @@ namespace AuthenticodeLint.Rules
             var result = RuleResult.Pass;
             foreach(var signature in signatures)
             {
-                var signatureInfo = signature;
-                if (signatureInfo.DigestAlgorithm.Value == KnownOids.MD2)
+                if (signature.DigestAlgorithm.Value == KnownOids.MD2)
                 {
-                    verboseWriter.LogSignatureMessage(signatureInfo, $"Uses the {nameof(KnownOids.MD2)} digest algorithm.");
+                    verboseWriter.LogSignatureMessage(signature, $"Uses the {nameof(KnownOids.MD2)} digest algorithm.");
                     result = RuleResult.Fail;
                 }
-                else if (signatureInfo.DigestAlgorithm.Value == KnownOids.MD4)
+                else if (signature.DigestAlgorithm.Value == KnownOids.MD4)
                 {
-                    verboseWriter.LogSignatureMessage(signatureInfo, $"Uses the {nameof(KnownOids.MD4)} digest algorithm.");
+                    verboseWriter.LogSignatureMessage(signature, $"Uses the {nameof(KnownOids.MD4)} digest algorithm.");
                     result = RuleResult.Fail;
                 }
-                else if (signatureInfo.DigestAlgorithm.Value == KnownOids.MD5)
+                else if (signature.DigestAlgorithm.Value == KnownOids.MD5)
                 {
-                    verboseWriter.LogSignatureMessage(signatureInfo, $"Uses the {nameof(KnownOids.MD5)} digest algorithm.");
+                    verboseWriter.LogSignatureMessage(signature, $"Uses the {nameof(KnownOids.MD5)} digest algorithm.");
                     result = RuleResult.Fail;
                 }
             }

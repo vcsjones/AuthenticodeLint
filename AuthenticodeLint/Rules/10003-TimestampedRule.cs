@@ -18,13 +18,12 @@ namespace AuthenticodeLint.Rules
             foreach (var signature in signatures)
             {
                 var counterSignatures = signature.VisitAll(SignatureKind.AnyCounterSignature);
-                var signatureInfo = signature;
                 var isSigned = false;
                 var strongSign = false;
                 foreach (var counterSignature in counterSignatures)
                 {
                     isSigned = true;
-                    if (counterSignature.DigestAlgorithm.Value == signatureInfo.DigestAlgorithm.Value)
+                    if (counterSignature.DigestAlgorithm.Value == signature.DigestAlgorithm.Value)
                     {
                         strongSign = true;
                         break;
@@ -36,12 +35,12 @@ namespace AuthenticodeLint.Rules
                 }
                 if (!isSigned)
                 {
-                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature is not timestamped.");
+                    verboseWriter.LogSignatureMessage(signature, "Signature is not timestamped.");
                     pass = false;
                 }
                 else if (!strongSign)
                 {
-                    verboseWriter.LogSignatureMessage(signatureInfo, $"Signature is not timestamped with the expected hash algorithm {signatureInfo.DigestAlgorithm.FriendlyName}.");
+                    verboseWriter.LogSignatureMessage(signature, $"Signature is not timestamped with the expected hash algorithm {signature.DigestAlgorithm.FriendlyName}.");
                     pass = false;
                 }
             }
