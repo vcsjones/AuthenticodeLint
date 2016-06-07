@@ -9,7 +9,7 @@ namespace AuthenticodeLintTests.Rules
     {
         private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null);
 
-        private static Graph<Signature> GetGraphForFile(string file)
+        private static IReadOnlyList<ISignature> GetGraphForFile(string file)
         {
             var extractor = new SignatureExtractor();
             return extractor.Extract(file);

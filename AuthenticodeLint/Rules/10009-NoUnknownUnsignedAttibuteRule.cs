@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AuthenticodeLint.Rules
@@ -18,15 +19,14 @@ namespace AuthenticodeLint.Rules
             KnownOids.NestedSignatureOid
         };
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var signatures = graph.VisitAll();
+            var signatures = graph.VisitAll(SignatureKind.AnySignature);
             var result = RuleResult.Pass;
             foreach(var signature in signatures)
             {
-                var signer = signature.SignerInfo;
-                var counterSignatures = GraphBuilder.WalkCounterSignatures(signature);
-                foreach(var counterSignature in counterSignatures.VisitAll())
+                var counterSignatures = signature.VisitAll(SignatureKind.AnyCounterSignature);
+                foreach(var counterSignature in counterSignatures)
                 {
                     foreach (var attribute in counterSignature.UnsignedAttributes)
                     {
@@ -34,17 +34,17 @@ namespace AuthenticodeLint.Rules
                         {
                             result = RuleResult.Fail;
                             var displayName = attribute.Oid.FriendlyName ?? "<no friendly name>";
-                            verboseWriter.LogSignatureMessage(signer, $"Signature contains counter signer with unknown unsigned attribute {displayName} ({attribute.Oid.Value}).");
+                            verboseWriter.LogSignatureMessage(signature, $"Signature contains counter signer with unknown unsigned attribute {displayName} ({attribute.Oid.Value}).");
                         }
                     }
                 }
-                foreach(var attribute in signer.UnsignedAttributes)
+                foreach(var attribute in signature.UnsignedAttributes)
                 {
                     if (!_trustedUnsignedAttributes.Contains(attribute.Oid.Value))
                     {
                         result = RuleResult.Fail;
                         var displayName = attribute.Oid.FriendlyName ?? "<no friendly name>";
-                        verboseWriter.LogSignatureMessage(signer, $"Signature contains unknown unsigned attribute {displayName} ({attribute.Oid.Value}).");
+                        verboseWriter.LogSignatureMessage(signature, $"Signature contains unknown unsigned attribute {displayName} ({attribute.Oid.Value}).");
                     }
                 }
             }

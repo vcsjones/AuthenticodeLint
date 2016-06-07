@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AuthenticodeLint.Rules
 {
@@ -10,15 +11,14 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks that the signature provided publisher information.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var signatures = graph.VisitAll();
+            var signatures = graph.VisitAll(SignatureKind.AnySignature);
             var result = RuleResult.Pass;
             foreach (var signature in signatures)
             {
-                var signatureInfo = signature.SignerInfo;
                 PublisherInformation info = null;
-                foreach (var attribute in signatureInfo.SignedAttributes)
+                foreach (var attribute in signature.SignedAttributes)
                 {
                     if (attribute.Oid.Value == KnownOids.OpusInfo)
                     {
@@ -29,20 +29,20 @@ namespace AuthenticodeLint.Rules
                 if (info == null)
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have any publisher information.");
+                    verboseWriter.LogSignatureMessage(signature, "Signature does not have any publisher information.");
                 }
                 else
                 {
                     if (string.IsNullOrWhiteSpace(info.Description))
                     {
                         result = RuleResult.Fail;
-                        verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying description.");
+                        verboseWriter.LogSignatureMessage(signature, "Signature does not have an accompanying description.");
                     }
 
                     if (string.IsNullOrWhiteSpace(info.UrlLink))
                     {
                         result = RuleResult.Fail;
-                        verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying URL.");
+                        verboseWriter.LogSignatureMessage(signature, "Signature does not have an accompanying URL.");
                     }
                     else
                     {
@@ -50,7 +50,7 @@ namespace AuthenticodeLint.Rules
                         if (!Uri.TryCreate(info.UrlLink, UriKind.Absolute, out uri))
                         {
                             result = RuleResult.Fail;
-                            verboseWriter.LogSignatureMessage(signatureInfo, "Signature's accompanying URL is not a valid URI.");
+                            verboseWriter.LogSignatureMessage(signature, "Signature's accompanying URL is not a valid URI.");
                         }
                     }
                 }

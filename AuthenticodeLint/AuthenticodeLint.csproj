@@ -59,7 +59,6 @@
     <Compile Include="CommandLineParser.cs" />
     <Compile Include="ConfigurationValidator.cs" />
     <Compile Include="Extraction.cs" />
-    <Compile Include="GraphBuilders.cs" />
     <Compile Include="Interop\CertStoreSafeHandle.cs" />
     <Compile Include="Interop\Crypt32.cs" />
     <Compile Include="Interop\CryptMsgSafeHandle.cs" />
@@ -67,12 +66,13 @@
     <Compile Include="Interop\Pe.cs" />
     <Compile Include="Interop\Wintrust.cs" />
     <Compile Include="IRuleResultCollector.cs" />
+    <Compile Include="ISignature.cs" />
     <Compile Include="KnownGuids.cs" />
     <Compile Include="KnownOids.cs" />
     <Compile Include="OidParser.cs" />
     <Compile Include="PE\PortableExecutable.cs" />
     <Compile Include="PublisherInformation.cs" />
-    <Compile Include="Rfc3161Signature.cs" />
+    <Compile Include="Signature.cs" />
     <Compile Include="Rules\10013-MaxKeyLengthRule.cs" />
     <Compile Include="Rules\10011-StrongKeyLengthRule.cs" />
     <Compile Include="Rules\10012-RsaDsaPrimarySignatureRule.cs" />
@@ -92,9 +92,8 @@
     <Compile Include="Rules\10007-TrustedSignatureRule.cs" />
     <Compile Include="Rules\10009-NoUnknownUnsignedAttibuteRule.cs" />
     <Compile Include="Rules\10008-WinCertificatePaddingRule.cs" />
-    <Compile Include="Signature.cs" />
+    <Compile Include="SignatureExtensions.cs" />
     <Compile Include="SignatureExtractor.cs" />
-    <Compile Include="Graph.cs" />
     <Compile Include="SignatureHasher.cs" />
     <Compile Include="SignerInfoExtensions.cs" />
     <Compile Include="StdOutRuleResultCollector.cs" />

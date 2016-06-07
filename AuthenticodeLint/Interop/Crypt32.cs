@@ -40,6 +40,24 @@ namespace AuthenticodeLint.Interop
             [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr ppvContext
          );
 
+
+        [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptQueryObject", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool CryptQueryObject
+        (
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryObjectType dwObjectType,
+            [param: In, Out, MarshalAs(UnmanagedType.Struct)] ref CRYPTOAPI_BLOB pvObject,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryContentFlagType dwExpectedContentTypeFlags,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryFormatFlagType dwExpectedFormatTypeFlags,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryObjectFlags dwFlags,
+            [param: Out, MarshalAs(UnmanagedType.U4)] out EncodingType pdwMsgAndCertEncodingType,
+            [param: Out, MarshalAs(UnmanagedType.U4)] out CryptQueryContentType pdwContentType,
+            [param: Out, MarshalAs(UnmanagedType.U4)] out CryptQueryFormatType pdwFormatType,
+            [param: In, MarshalAs(UnmanagedType.SysInt)]  IntPtr phCertStore,
+            [param: Out] out CryptMsgSafeHandle phMsg,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr ppvContext
+         );
+
         [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptDecodeObjectEx", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern unsafe bool CryptDecodeObjectEx

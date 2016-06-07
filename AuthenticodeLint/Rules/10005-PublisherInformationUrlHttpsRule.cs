@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.Pkcs;
 
 namespace AuthenticodeLint.Rules
@@ -11,15 +12,14 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks that the signature uses HTTPS for the publisher's URL.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var signatures = graph.VisitAll();
+            var signatures = graph.VisitAll(SignatureKind.AnySignature);
             var result = RuleResult.Pass;
             foreach(var signature in signatures)
             {
-                var signatureInfo = signature.SignerInfo;
                 PublisherInformation info = null;
-                foreach(var attribute in signatureInfo.SignedAttributes)
+                foreach(var attribute in signature.SignedAttributes)
                 {
                     if (attribute.Oid.Value == KnownOids.OpusInfo)
                     {
@@ -30,19 +30,19 @@ namespace AuthenticodeLint.Rules
                 if (info == null)
                 {
                     result = RuleResult.Fail;
-                    verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have any publisher information.");
+                    verboseWriter.LogSignatureMessage(signature, "Signature does not have any publisher information.");
                 }
                 else
                 {
                     if (string.IsNullOrWhiteSpace(info.UrlLink))
                     {
                         result = RuleResult.Fail;
-                        verboseWriter.LogSignatureMessage(signatureInfo, "Signature does not have an accompanying URL.");
+                        verboseWriter.LogSignatureMessage(signature, "Signature does not have an accompanying URL.");
                     }
                     else if (!info.UrlLink.StartsWith(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
                     {
                         result = RuleResult.Fail;
-                        verboseWriter.LogSignatureMessage(signatureInfo, $"Signature's publisher information URL \"{info.UrlLink}\" does not use the secure HTTPS scheme.");
+                        verboseWriter.LogSignatureMessage(signature, $"Signature's publisher information URL \"{info.UrlLink}\" does not use the secure HTTPS scheme.");
                     }
                 }
             }

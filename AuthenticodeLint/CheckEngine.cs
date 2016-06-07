@@ -24,7 +24,7 @@ namespace AuthenticodeLint
                     ).ToList();
         }
 
-        public RuleEngineResult RunAllRules(string file, Graph<Signature> signatures, List<IRuleResultCollector> collectors, CheckConfiguration configuration)
+        public RuleEngineResult RunAllRules(string file, IReadOnlyList<ISignature> signatures, List<IRuleResultCollector> collectors, CheckConfiguration configuration)
         {
             var verbose = configuration.Verbose;
             var suppressedRuleIDs = configuration.SuppressErrorIDs;

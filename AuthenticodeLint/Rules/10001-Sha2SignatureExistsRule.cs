@@ -13,13 +13,13 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "A SHA2 signature should exist.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var signatures = graph.VisitAll();
+            var signatures = graph.VisitAll(SignatureKind.AnySignature);
             if (signatures.Any(s =>
-                s.SignerInfo.DigestAlgorithm.Value == KnownOids.SHA256 ||
-                s.SignerInfo.DigestAlgorithm.Value == KnownOids.SHA384 ||
-                s.SignerInfo.DigestAlgorithm.Value == KnownOids.SHA512))
+                s.DigestAlgorithm.Value == KnownOids.SHA256 ||
+                s.DigestAlgorithm.Value == KnownOids.SHA384 ||
+                s.DigestAlgorithm.Value == KnownOids.SHA512))
             {
                 return RuleResult.Pass;
             }
