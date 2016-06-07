@@ -8,16 +8,16 @@ namespace AuthenticodeLint
     {
         public static Graph<Signature> ExplodeGraph(byte[] entireMessage, string nestedOidType) => WalkGraph(new List<byte[]> { entireMessage }, nestedOidType);
 
-        public static Graph<ICounterSignature> WalkCounterSignatures(Signature signature) => WalkCounterSignatures(signature.SignerInfo.UnsignedAttributes);
+        public static Graph<ISignature> WalkCounterSignatures(Signature signature) => WalkCounterSignatures(signature.SignerInfo.UnsignedAttributes);
 
-        private static Graph<ICounterSignature> WalkCounterSignatures(CryptographicAttributeObjectCollection attributes)
+        private static Graph<ISignature> WalkCounterSignatures(CryptographicAttributeObjectCollection attributes)
         {
-            var graphItems = new List<GraphItem<ICounterSignature>>();
+            var graphItems = new List<GraphItem<ISignature>>();
             foreach (var attribute in attributes)
             {
                 foreach(var value in attribute.Values)
                 {
-                    ICounterSignature signature;
+                    ISignature signature;
                     if (attribute.Oid.Value == KnownOids.AuthenticodeCounterSignature)
                     {
                         signature = new AuthenticodeSignature(value);
@@ -35,10 +35,10 @@ namespace AuthenticodeLint
                     {
                         childAttributes.Add(childAttribute);
                     }
-                    graphItems.Add(new GraphItem<ICounterSignature>(signature, WalkCounterSignatures(childAttributes)));
+                    graphItems.Add(new GraphItem<ISignature>(signature, WalkCounterSignatures(childAttributes)));
                 }
             }
-            return new Graph<ICounterSignature>(graphItems);
+            return new Graph<ISignature>(graphItems);
         }
 
         private static Graph<Signature> WalkGraph(IList<byte[]> cmsData, string nestedOidType)

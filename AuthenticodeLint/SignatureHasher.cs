@@ -20,5 +20,10 @@ namespace AuthenticodeLint
         {
             return data.Aggregate(new StringBuilder(), (acc, b) => acc.AppendFormat("{0:x2}", b)).ToString();
         }
+
+        public static string HexEncodeBigEndian(byte[] data)
+        {
+            return data.Aggregate(new StringBuilder(), (acc, b) => acc.Insert(0, string.Format("{0:x2}", b))).ToString();
+        }
     }
 }
