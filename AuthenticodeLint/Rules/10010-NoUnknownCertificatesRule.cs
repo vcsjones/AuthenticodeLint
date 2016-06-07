@@ -17,10 +17,10 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks for unknown embedded certificates.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var result = RuleResult.Pass;
-            var signatures = graph.VisitAll();
+            var signatures = graph.VisitAll(SignatureKind.AnySignature);
             foreach (var signature in signatures)
             {
                 var allEmbeddedCertificates = signature.AdditionalCertificates.Cast<X509Certificate2>().ToList();
@@ -49,7 +49,7 @@ namespace AuthenticodeLint.Rules
                 {
                     foreach (var certificate in certificatesRequiringEliminiation)
                     {
-                        verboseWriter.LogSignatureMessage(signature.SignerInfo, $"Signature contained untrusted certificate \"{certificate.Subject}\" ({certificate.Thumbprint}).");
+                        verboseWriter.LogSignatureMessage(signature, $"Signature contained untrusted certificate \"{certificate.Subject}\" ({certificate.Thumbprint}).");
                     }
                     result = RuleResult.Fail;
                 }

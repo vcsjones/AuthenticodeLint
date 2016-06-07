@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace AuthenticodeLint.Rules
 {
@@ -10,17 +11,17 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Primary signature should be SHA1.";
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var primary = graph.SingleOrDefault()?.Node;
+            var primary = graph.SingleOrDefault();
             //There are zero signatures.
             if (primary == null)
             {
                 return RuleResult.Fail;
             }
-            if (primary.SignerInfo.DigestAlgorithm.Value != KnownOids.SHA1)
+            if (primary.DigestAlgorithm.Value != KnownOids.SHA1)
             {
-                verboseWriter.LogSignatureMessage(primary.SignerInfo, $"Expected {nameof(KnownOids.SHA1)} digest algorithm but is {primary.SignerInfo.DigestAlgorithm.FriendlyName}.");
+                verboseWriter.LogSignatureMessage(primary, $"Expected {nameof(KnownOids.SHA1)} digest algorithm but is {primary.DigestAlgorithm.FriendlyName}.");
                 return RuleResult.Fail;
             }
             return RuleResult.Pass;

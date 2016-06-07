@@ -2,14 +2,13 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using AuthenticodeLint.Interop;
-using System.Security.Cryptography.Pkcs;
 using System.Collections.Generic;
 
 namespace AuthenticodeLint
 {
     public class SignatureExtractor
     {
-        public Graph<Signature> Extract(string filePath)
+        public IReadOnlyList<ISignature> Extract(string filePath)
         {
             EncodingType encodingType;
             CryptQueryContentType contentType;
@@ -20,10 +19,10 @@ namespace AuthenticodeLint
             if (!result)
             {
                 var resultCode = Marshal.GetLastWin32Error();
-                switch(unchecked((uint)resultCode))
+                switch (unchecked((uint)resultCode))
                 {
                     case 0x80092009: //Cannot find request object. There's no signature.
-                        return Graph<Signature>.Empty;
+                        return new List<ISignature>().AsReadOnly();
                     default:
                         throw new Win32Exception(resultCode, "Failed to extract signature.");
                 }
@@ -39,22 +38,41 @@ namespace AuthenticodeLint
             }
         }
 
-        private unsafe Graph<Signature> GetSignatures(CryptMsgSafeHandle messageHandle)
+        private unsafe IReadOnlyList<ISignature> GetSignatures(CryptMsgSafeHandle messageHandle)
         {
-            uint size = 0;
-            var signatures = new List<SignerInfo>();
-            if (Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_ENCODED_MESSAGE, 0, (void*)null, ref size))
+            var countSize = 0u;
+            if (!Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_SIGNER_COUNT_PARAM, 0, LocalBufferSafeHandle.Zero, ref countSize))
             {
-                var buffer = new byte[(int)size];
-                fixed(byte* buf = buffer)
+                return null;
+            }
+            uint signerCount;
+            using (var countHandle = LocalBufferSafeHandle.Alloc(countSize))
+            {
+                if (!Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_SIGNER_COUNT_PARAM, 0, countHandle, ref countSize))
                 {
-                    if (Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_ENCODED_MESSAGE, 0, buf, ref size))
+                    return null;
+                }
+                signerCount = (uint)Marshal.ReadInt32(countHandle.DangerousGetHandle());
+            }
+            var signatures = new List<ISignature>();
+            for (var i = 0u; i < signerCount; i++)
+            {
+                var signerSize = 0u;
+                if (!Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_SIGNER_INFO_PARAM, i, LocalBufferSafeHandle.Zero, ref signerSize))
+                {
+                    continue;
+                }
+                using (var signerHandle = LocalBufferSafeHandle.Alloc(signerSize))
+                {
+                    if (!Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_SIGNER_INFO_PARAM, i, signerHandle, ref signerSize))
                     {
-                        return GraphBuilder.ExplodeGraph(buffer, KnownOids.NestedSignatureOid);
+                        continue;
                     }
+                    var signature = new Signature(SignatureKind.Signature, messageHandle, signerHandle);
+                    signatures.Add(signature);
                 }
             }
-            return null;
+            return signatures.AsReadOnly();
         }
     }
 }

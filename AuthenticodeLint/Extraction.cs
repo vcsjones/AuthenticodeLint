@@ -1,4 +1,5 @@
 ﻿using AuthenticodeLint.Interop;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -7,7 +8,7 @@ namespace AuthenticodeLint
 {
     public class Extraction
     {
-        public static void ExtractToDisk(string file, CheckConfiguration configuration, Graph<Signature> signatureGraph)
+        public static void ExtractToDisk(string file, CheckConfiguration configuration, IReadOnlyList<ISignature> signatureGraph)
         {
             var fileDirectory = Path.Combine(configuration.ExtractPath, Path.GetFileName(file));
             if (Directory.Exists(fileDirectory))
@@ -15,10 +16,10 @@ namespace AuthenticodeLint
                 Directory.Delete(fileDirectory, true);
             }
             Directory.CreateDirectory(fileDirectory);
-            var signatures = signatureGraph.VisitAll();
+            var signatures = signatureGraph.VisitAll(SignatureKind.AnySignature);
             foreach(var signature in signatures)
             {
-                var signatureHash = HashHelpers.GetHashForSignature(signature.SignerInfo);
+                var signatureHash = HashHelpers.GetHashForSignature(signature);
                 var signatureDirectory = Path.Combine(fileDirectory, signatureHash);
                 var certificateDirectory = Path.Combine(signatureDirectory, "Certificates");
                 if (!Directory.Exists(certificateDirectory))

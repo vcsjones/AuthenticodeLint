@@ -1,4 +1,6 @@
-﻿namespace AuthenticodeLint.Rules
+﻿using System.Collections.Generic;
+
+namespace AuthenticodeLint.Rules
 {
     public interface IAuthenticodeRule
     {
@@ -9,7 +11,7 @@
 
     public interface IAuthenticodeSignatureRule : IAuthenticodeRule
     {
-        RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration);
+        RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration);
     }
 
     public interface IAuthenticodeFileRule : IAuthenticodeRule

@@ -40,6 +40,24 @@ namespace AuthenticodeLint.Interop
             [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr ppvContext
          );
 
+
+        [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptQueryObject", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool CryptQueryObject
+        (
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryObjectType dwObjectType,
+            [param: In, Out, MarshalAs(UnmanagedType.Struct)] ref CRYPTOAPI_BLOB pvObject,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryContentFlagType dwExpectedContentTypeFlags,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryFormatFlagType dwExpectedFormatTypeFlags,
+            [param: In, MarshalAs(UnmanagedType.U4)] CryptQueryObjectFlags dwFlags,
+            [param: Out, MarshalAs(UnmanagedType.U4)] out EncodingType pdwMsgAndCertEncodingType,
+            [param: Out, MarshalAs(UnmanagedType.U4)] out CryptQueryContentType pdwContentType,
+            [param: Out, MarshalAs(UnmanagedType.U4)] out CryptQueryFormatType pdwFormatType,
+            [param: In, MarshalAs(UnmanagedType.SysInt)]  IntPtr phCertStore,
+            [param: Out] out CryptMsgSafeHandle phMsg,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr ppvContext
+         );
+
         [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CryptDecodeObjectEx", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern unsafe bool CryptDecodeObjectEx
@@ -133,6 +151,33 @@ namespace AuthenticodeLint.Interop
             [param: In, Out] StringBuilder pszString,
             [param: In, Out] ref uint pcchString
         );
+
+        [method: DllImport("crypt32.dll", CallingConvention = CallingConvention.Winapi, EntryPoint = "CertNameToStr", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.U4)]
+        public static unsafe extern uint CertNameToStr
+        (
+            [param: In, MarshalAs(UnmanagedType.U4)] EncodingType dwCertEncodingType,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr pName,
+            [param: In, MarshalAs(UnmanagedType.U4)] CertNameStrType dwStrType,
+            [param: In, Out] StringBuilder psz,
+            [param: In] uint csz
+        );
+    }
+
+    [type: Flags]
+    internal enum CertNameStrType : uint
+    {
+        CERT_SIMPLE_NAME_STR = 1,
+        CERT_OID_NAME_STR = 2,
+        CERT_X500_NAME_STR = 3,
+
+        CERT_NAME_STR_SEMICOLON_FLAG = 0x40000000,
+        CERT_NAME_STR_CRLF_FLAG = 0x08000000,
+        CERT_NAME_STR_NO_PLUS_FLAG = 0x20000000,
+        CERT_NAME_STR_NO_QUOTING_FLAG = 0x10000000,
+        CERT_NAME_STR_REVERSE_FLAG = 0x02000000,
+        CERT_NAME_STR_DISABLE_IE4_UTF8_FLAG = 0x00010000,
+        CERT_NAME_STR_ENABLE_PUNYCODE_FLAG = 0x00200000
     }
 
     internal enum CryptBinaryToStringFlags : uint
@@ -402,11 +447,33 @@ namespace AuthenticodeLint.Interop
         public IntPtr hCertStore;
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [type: StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     internal struct CRYPT_ATTRIBUTE
     {
         public string pszObjId;
         public uint cValue;
         public IntPtr rgValue;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential)]
+    internal struct CERT_NAME_INFO
+    {
+        public uint cRDN;
+        public IntPtr rgRDN;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential)]
+    internal struct CERT_RDN
+    {
+        public uint cRDNAttr;
+        public IntPtr rgRDNAttr;
+    }
+
+    [type: StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    internal struct CERT_RDN_ATTR
+    {
+        public string pszObjId;
+        public uint dwValueType;
+        public CRYPTOAPI_BLOB Value;
     }
 }

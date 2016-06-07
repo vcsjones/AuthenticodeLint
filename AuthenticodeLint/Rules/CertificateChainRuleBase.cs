@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace AuthenticodeLint.Rules
 {
@@ -8,14 +9,15 @@ namespace AuthenticodeLint.Rules
         public abstract string RuleName { get; }
         public abstract string ShortDescription { get; }
 
-        protected abstract bool ValidateChain(Signature signer, X509Chain chain, SignatureLogger verboseWriter);
+        protected abstract bool ValidateChain(ISignature signer, X509Chain chain, SignatureLogger verboseWriter);
 
-        public RuleResult Validate(Graph<Signature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var signatures = graph.VisitAll();
+            var signatures = graph.VisitAll(SignatureKind.AnySignature);
             var result = RuleResult.Pass;
             foreach (var signature in signatures)
             {
+                
                 var certificates = signature.AdditionalCertificates;
                 using (var chain = new X509Chain())
                 {
@@ -26,10 +28,10 @@ namespace AuthenticodeLint.Rules
                     //It is possible to have a valid Authenticode signature if the certificate is expired but was
                     //timestamped while it was valid. In this case we still want to successfully build a chain to perform validation.
                     chain.ChainPolicy.VerificationFlags = X509VerificationFlags.IgnoreNotTimeValid;
-                    bool success = chain.Build(signature.SignerInfo.Certificate);
+                    bool success = chain.Build(signature.Certificate);
                     if (!success)
                     {
-                        verboseWriter.LogSignatureMessage(signature.SignerInfo, $"Cannot build a chain successfully with signing certificate {signature.SignerInfo.Certificate.SerialNumber}.");
+                        verboseWriter.LogSignatureMessage(signature, $"Cannot build a chain successfully with signing certificate {signature.Certificate.SerialNumber}.");
                         result = RuleResult.Fail;
                         continue;
                     }
