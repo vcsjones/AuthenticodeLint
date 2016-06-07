@@ -115,7 +115,58 @@ namespace AuthenticodeLint
             return certs;
         }
 
-        public IReadOnlyList<ISignature> GetNestedSignatures()
+        public abstract IReadOnlyList<ISignature> GetNestedSignatures();
+    }
+
+    public class AuthenticodeSignature : SignatureBase
+    {
+        public override Oid DigestAlgorithm { get; protected set; }
+        public override Oid HashEncryptionAlgorithm { get; protected set; }
+        public override CryptographicAttributeObjectCollection UnsignedAttributes { get; protected set; }
+        public override CryptographicAttributeObjectCollection SignedAttributes { get; protected set; }
+        public override byte[] SerialNumber { get; protected set; }
+        public override X509Certificate2 Certificate { get; protected set; }
+        public override SignatureKind Kind { get; } = SignatureKind.AuthenticodeSignature;
+        public override X509Certificate2Collection AdditionalCertificates { get; protected set; }
+        public ISignature OwningSignature { get; }
+
+        public unsafe AuthenticodeSignature(AsnEncodedData data, ISignature owningSignature)
+        {
+            OwningSignature = owningSignature;
+            AdditionalCertificates = owningSignature.AdditionalCertificates;
+            fixed (byte* dataPtr = data.RawData)
+            {
+                uint size = 0;
+                LocalBufferSafeHandle localBuffer;
+                if (Crypt32.CryptDecodeObjectEx(EncodingType.PKCS_7_ASN_ENCODING | EncodingType.X509_ASN_ENCODING, (IntPtr)500, new IntPtr(dataPtr), (uint)data.RawData.Length, CryptDecodeFlags.CRYPT_DECODE_ALLOC_FLAG, IntPtr.Zero, out localBuffer, ref size))
+                {
+                    using (localBuffer)
+                    {
+                        var signerInfo = Marshal.PtrToStructure<CMSG_SIGNER_INFO>(localBuffer.DangerousGetHandle());
+                        DigestAlgorithm = new Oid(signerInfo.HashAlgorithm.pszObjId);
+                        HashEncryptionAlgorithm = new Oid(signerInfo.HashEncryptionAlgorithm.pszObjId);
+                        SerialNumber = ReadBlob(signerInfo.SerialNumber);
+                        UnsignedAttributes = ReadAttributes(signerInfo.UnauthAttrs);
+                        SignedAttributes = ReadAttributes(signerInfo.AuthAttrs);
+                        var subjectId = new UniversalSubjectIdentifier(signerInfo.Issuer, signerInfo.SerialNumber);
+                        if (subjectId.Type == SubjectIdentifierType.SubjectKeyIdentifier)
+                        {
+                            Certificate = FindCertificate((string)subjectId.Value, OwningSignature.AdditionalCertificates);
+                        }
+                        else if (subjectId.Type == SubjectIdentifierType.IssuerAndSerialNumber)
+                        {
+                            Certificate = FindCertificate((X509IssuerSerial)subjectId.Value, OwningSignature.AdditionalCertificates);
+                        }
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException("Failed to read Authenticode signature");
+                }
+            }
+        }
+
+        public override IReadOnlyList<ISignature> GetNestedSignatures()
         {
             var list = new List<ISignature>();
             foreach (var attribute in UnsignedAttributes)
@@ -125,7 +176,7 @@ namespace AuthenticodeLint
                     ISignature signature;
                     if (attribute.Oid.Value == KnownOids.AuthenticodeCounterSignature)
                     {
-                        signature = new AuthenticodeSignature(value);
+                        signature = new AuthenticodeSignature(value, OwningSignature);
                     }
                     else if (attribute.Oid.Value == KnownOids.Rfc3161CounterSignature)
                     {
@@ -148,54 +199,6 @@ namespace AuthenticodeLint
                 }
             }
             return list.AsReadOnly();
-        }
-    }
-
-    public class AuthenticodeSignature : SignatureBase
-    {
-
-        public override Oid DigestAlgorithm { get; protected set; }
-        public override Oid HashEncryptionAlgorithm { get; protected set; }
-        public override CryptographicAttributeObjectCollection UnsignedAttributes { get; protected set; }
-        public override CryptographicAttributeObjectCollection SignedAttributes { get; protected set; }
-        public override byte[] SerialNumber { get; protected set; }
-        public override X509Certificate2 Certificate { get; protected set; }
-        public override SignatureKind Kind { get; } = SignatureKind.AuthenticodeSignature;
-        public override X509Certificate2Collection AdditionalCertificates
-        {
-            get
-            {
-                return new X509Certificate2Collection();
-            }
-
-            protected set
-            {
-            }
-        }
-
-        public unsafe AuthenticodeSignature(AsnEncodedData data)
-        {
-            fixed (byte* dataPtr = data.RawData)
-            {
-                uint size = 0;
-                LocalBufferSafeHandle localBuffer;
-                if (Crypt32.CryptDecodeObjectEx(EncodingType.PKCS_7_ASN_ENCODING | EncodingType.X509_ASN_ENCODING, (IntPtr)500, new IntPtr(dataPtr), (uint)data.RawData.Length, CryptDecodeFlags.CRYPT_DECODE_ALLOC_FLAG, IntPtr.Zero, out localBuffer, ref size))
-                {
-                    using (localBuffer)
-                    {
-                        var signerInfo = Marshal.PtrToStructure<CMSG_SIGNER_INFO>(localBuffer.DangerousGetHandle());
-                        DigestAlgorithm = new Oid(signerInfo.HashAlgorithm.pszObjId);
-                        HashEncryptionAlgorithm = new Oid(signerInfo.HashEncryptionAlgorithm.pszObjId);
-                        SerialNumber = ReadBlob(signerInfo.SerialNumber);
-                        UnsignedAttributes = ReadAttributes(signerInfo.UnauthAttrs);
-                        SignedAttributes = ReadAttributes(signerInfo.AuthAttrs);
-                    }
-                }
-                else
-                {
-                    throw new InvalidOperationException("Failed to read Authenticode signature");
-                }
-            }
         }
     }
 
@@ -283,6 +286,41 @@ namespace AuthenticodeLint
                     InitFromHandles(msgHandle, signerHandle);
                 }
             }
+        }
+
+        public override IReadOnlyList<ISignature> GetNestedSignatures()
+        {
+            var list = new List<ISignature>();
+            foreach (var attribute in UnsignedAttributes)
+            {
+                foreach (var value in attribute.Values)
+                {
+                    ISignature signature;
+                    if (attribute.Oid.Value == KnownOids.AuthenticodeCounterSignature)
+                    {
+                        signature = new AuthenticodeSignature(value, this);
+                    }
+                    else if (attribute.Oid.Value == KnownOids.Rfc3161CounterSignature)
+                    {
+                        signature = new Signature(value, SignatureKind.Rfc3161Signature);
+                    }
+                    else if (attribute.Oid.Value == KnownOids.NestedSignatureOid)
+                    {
+                        signature = new Signature(value, SignatureKind.NestedSignature);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                    var childAttributes = new CryptographicAttributeObjectCollection();
+                    foreach (var childAttribute in signature.UnsignedAttributes)
+                    {
+                        childAttributes.Add(childAttribute);
+                    }
+                    list.Add(signature);
+                }
+            }
+            return list.AsReadOnly();
         }
     }
 
