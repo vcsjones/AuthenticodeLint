@@ -18,7 +18,7 @@ namespace AuthenticodeLint.Interop
             [param: Out, MarshalAs(UnmanagedType.U4)] out EncodingType pdwMsgAndCertEncodingType,
             [param: Out, MarshalAs(UnmanagedType.U4)] out CryptQueryContentType pdwContentType,
             [param: Out, MarshalAs(UnmanagedType.U4)] out CryptQueryFormatType pdwFormatType,
-            [param: Out] out CertStoreSafeHandle phCertStore,
+            [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr phCertStore,
             [param: Out] out CryptMsgSafeHandle phMsg,
             [param: In, MarshalAs(UnmanagedType.SysInt)] IntPtr ppvContext
          );

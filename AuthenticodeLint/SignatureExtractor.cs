@@ -13,9 +13,8 @@ namespace AuthenticodeLint
             EncodingType encodingType;
             CryptQueryContentType contentType;
             CryptQueryFormatType formatType;
-            CertStoreSafeHandle certStoreHandle = CertStoreSafeHandle.InvalidHandle;
             CryptMsgSafeHandle message = CryptMsgSafeHandle.InvalidHandle;
-            var result = Crypt32.CryptQueryObject(CryptQueryObjectType.CERT_QUERY_OBJECT_FILE, filePath, CryptQueryContentFlagType.CERT_QUERY_CONTENT_FLAG_PKCS7_SIGNED_EMBED, CryptQueryFormatFlagType.CERT_QUERY_FORMAT_FLAG_BINARY, CryptQueryObjectFlags.NONE, out encodingType, out contentType, out formatType, out certStoreHandle, out message, IntPtr.Zero);
+            var result = Crypt32.CryptQueryObject(CryptQueryObjectType.CERT_QUERY_OBJECT_FILE, filePath, CryptQueryContentFlagType.CERT_QUERY_CONTENT_FLAG_PKCS7_SIGNED_EMBED, CryptQueryFormatFlagType.CERT_QUERY_FORMAT_FLAG_BINARY, CryptQueryObjectFlags.NONE, out encodingType, out contentType, out formatType, IntPtr.Zero, out message, IntPtr.Zero);
             if (!result)
             {
                 var resultCode = Marshal.GetLastWin32Error();
@@ -28,9 +27,8 @@ namespace AuthenticodeLint
                 }
             }
             using (message)
-            using (certStoreHandle) //The ctor of X509Store duplicates the store handle, so we need to clean up the one created here.
             {
-                if (message.IsInvalid || message.IsClosed || certStoreHandle.IsClosed || certStoreHandle.IsInvalid)
+                if (message.IsInvalid || message.IsClosed)
                 {
                     return null;
                 }
