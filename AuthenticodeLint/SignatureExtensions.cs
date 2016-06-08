@@ -11,12 +11,9 @@ namespace AuthenticodeLint
             {
                 yield return signature;
             }
-            foreach (var nested in signature.GetNestedSignatures())
+            foreach (var nested in signature.GetNestedSignatures().VisitAll(kind))
             {
-                if ((nested.Kind & kind) > 0)
-                {
-                    yield return nested;
-                }
+                yield return nested;
             }
         }
 
@@ -28,12 +25,9 @@ namespace AuthenticodeLint
                 {
                     yield return signature;
                 }
-                foreach (var nested in signature.GetNestedSignatures())
+                foreach (var nested in signature.GetNestedSignatures().VisitAll(kind))
                 {
-                    if ((nested.Kind & kind) > 0)
-                    {
-                        yield return nested;
-                    }
+                    yield return nested;
                 }
             }
         }
