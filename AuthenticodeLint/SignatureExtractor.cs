@@ -21,7 +21,7 @@ namespace AuthenticodeLint
                 switch (unchecked((uint)resultCode))
                 {
                     case 0x80092009: //Cannot find request object. There's no signature.
-                        return new List<ISignature>().AsReadOnly();
+                        return Array.Empty<ISignature>();
                     default:
                         throw new Win32Exception(resultCode, "Failed to extract signature.");
                 }
@@ -30,7 +30,7 @@ namespace AuthenticodeLint
             {
                 if (message.IsInvalid || message.IsClosed)
                 {
-                    return null;
+                    return Array.Empty<ISignature>();
                 }
                 return GetSignatures(message);
             }
@@ -41,14 +41,14 @@ namespace AuthenticodeLint
             var countSize = 0u;
             if (!Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_SIGNER_COUNT_PARAM, 0, LocalBufferSafeHandle.Zero, ref countSize))
             {
-                return null;
+                return Array.Empty<ISignature>();
             }
             uint signerCount;
             using (var countHandle = LocalBufferSafeHandle.Alloc(countSize))
             {
                 if (!Crypt32.CryptMsgGetParam(messageHandle, CryptMsgParamType.CMSG_SIGNER_COUNT_PARAM, 0, countHandle, ref countSize))
                 {
-                    return null;
+                    return Array.Empty<ISignature>();
                 }
                 signerCount = (uint)Marshal.ReadInt32(countHandle.DangerousGetHandle());
             }

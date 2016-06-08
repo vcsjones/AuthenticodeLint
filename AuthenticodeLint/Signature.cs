@@ -12,14 +12,14 @@ namespace AuthenticodeLint
 {
     public abstract class SignatureBase : ISignature
     {
-        public abstract Oid DigestAlgorithm { get; protected set; }
-        public abstract Oid HashEncryptionAlgorithm { get; protected set; }
-        public abstract CryptographicAttributeObjectCollection UnsignedAttributes { get; protected set; }
-        public abstract CryptographicAttributeObjectCollection SignedAttributes { get; protected set; }
-        public abstract byte[] SerialNumber { get; protected set; }
-        public abstract X509Certificate2 Certificate { get; protected set; }
-        public abstract SignatureKind Kind { get; }
-        public abstract X509Certificate2Collection AdditionalCertificates { get; protected set; }
+        public Oid DigestAlgorithm { get; protected set; }
+        public Oid HashEncryptionAlgorithm { get; protected set; }
+        public CryptographicAttributeObjectCollection UnsignedAttributes { get; protected set; }
+        public CryptographicAttributeObjectCollection SignedAttributes { get; protected set; }
+        public byte[] SerialNumber { get; protected set; }
+        public X509Certificate2 Certificate { get; protected set; }
+        public SignatureKind Kind { get; protected set; }
+        public X509Certificate2Collection AdditionalCertificates { get; protected set; }
 
         internal byte[] ReadBlob(CRYPTOAPI_BLOB blob)
         {
@@ -85,7 +85,7 @@ namespace AuthenticodeLint
             {
                 if (!Crypt32.CryptMsgGetParam(handle, CryptMsgParamType.CMSG_CERT_COUNT_PARAM, 0, certCountLocalBuffer, ref size))
                 {
-                    return null;
+                    return certs;
                 }
                 certCount = unchecked((uint)Marshal.ReadInt32(certCountLocalBuffer.DangerousGetHandle(), 0));
             }
@@ -120,14 +120,6 @@ namespace AuthenticodeLint
 
     public class AuthenticodeSignature : SignatureBase
     {
-        public override Oid DigestAlgorithm { get; protected set; }
-        public override Oid HashEncryptionAlgorithm { get; protected set; }
-        public override CryptographicAttributeObjectCollection UnsignedAttributes { get; protected set; }
-        public override CryptographicAttributeObjectCollection SignedAttributes { get; protected set; }
-        public override byte[] SerialNumber { get; protected set; }
-        public override X509Certificate2 Certificate { get; protected set; }
-        public override SignatureKind Kind { get; } = SignatureKind.AuthenticodeSignature;
-        public override X509Certificate2Collection AdditionalCertificates { get; protected set; }
         public ISignature OwningSignature { get; }
 
         public unsafe AuthenticodeSignature(AsnEncodedData data, ISignature owningSignature)
@@ -199,16 +191,6 @@ namespace AuthenticodeLint
 
     public class Signature : SignatureBase
     {
-        public override Oid DigestAlgorithm { get; protected set; }
-        public override Oid HashEncryptionAlgorithm { get; protected set; }
-        public override CryptographicAttributeObjectCollection UnsignedAttributes { get; protected set; }
-        public override CryptographicAttributeObjectCollection SignedAttributes { get; protected set; }
-        public override byte[] SerialNumber { get; protected set; }
-        public override X509Certificate2 Certificate { get; protected set; }
-        public override SignatureKind Kind { get; }
-
-        public override X509Certificate2Collection AdditionalCertificates { get; protected set; }
-
         internal Signature(SignatureKind kind, CryptMsgSafeHandle messageHandle, LocalBufferSafeHandle signerHandle)
         {
             Kind = kind;
