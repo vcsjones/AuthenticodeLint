@@ -13,12 +13,16 @@ namespace AuthenticodeLint.Rules
 
         public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var primary = graph.SingleOrDefault();
-            //There are zero signatures.
-            if (primary == null)
+            if (graph.Count == 0)
             {
                 return RuleResult.Fail;
             }
+            if (graph.Count > 1)
+            {
+                verboseWriter.LogMessage("Multiple primary signatures exist.");
+                return RuleResult.Fail;
+            }
+            var primary = graph[0];
             if (primary.DigestAlgorithm.Value != KnownOids.SHA1)
             {
                 verboseWriter.LogSignatureMessage(primary, $"Expected {nameof(KnownOids.SHA1)} digest algorithm but is {primary.DigestAlgorithm.FriendlyName}.");

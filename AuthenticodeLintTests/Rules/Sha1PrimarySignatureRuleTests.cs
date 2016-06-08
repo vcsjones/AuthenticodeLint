@@ -46,5 +46,25 @@ namespace AuthenticodeLintTests.Rules
             Assert.Equal(RuleResult.Pass, result);
             Assert.Empty(logger.Messages);
         }
+
+
+        [Fact]
+        public void ShouldFailOnMultiplePrimarySignatures()
+        {
+            var signature1 = new FakeSignature
+            {
+                DigestAlgorithm = new Oid(KnownOids.SHA1)
+            };
+            var signature2 = new FakeSignature
+            {
+                DigestAlgorithm = new Oid(KnownOids.SHA256)
+            };
+            var check = new Sha1PrimarySignatureRule();
+            var logger = new MemorySignatureLogger();
+            var result = check.Validate(new List<ISignature> { signature1, signature2 }, logger, Configuration);
+            Assert.Equal(RuleResult.Fail, result);
+            Assert.Contains("Multiple primary signatures exist.", logger.Messages);
+
+        }
     }
 }
