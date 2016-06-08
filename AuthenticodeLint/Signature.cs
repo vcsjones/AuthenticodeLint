@@ -74,12 +74,8 @@ namespace AuthenticodeLint
 
         internal X509Certificate2Collection GetCertificatesFromMessage(CryptMsgSafeHandle handle)
         {
-            var size = 0u;
+            var size = (uint)Marshal.SizeOf<uint>();
             var certs = new X509Certificate2Collection();
-            if (!Crypt32.CryptMsgGetParam(handle, CryptMsgParamType.CMSG_CERT_COUNT_PARAM, 0, LocalBufferSafeHandle.Zero, ref size))
-            {
-                return certs;
-            }
             uint certCount;
             using (var certCountLocalBuffer = LocalBufferSafeHandle.Alloc(size))
             {
