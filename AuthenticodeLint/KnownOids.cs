@@ -2,7 +2,7 @@
 
 namespace AuthenticodeLint
 {
-    internal static class KnownOids
+    public static class KnownOids
     {
         public static class X509Algorithms
         {
