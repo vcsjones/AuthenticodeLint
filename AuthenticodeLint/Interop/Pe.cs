@@ -115,19 +115,4 @@ namespace AuthenticodeLint.Interop
         public uint VirtualAddress;
         public uint Size;
     }
-
-    [type: StructLayout(LayoutKind.Sequential, Pack = 4)]
-    public struct IMAGE_SECTION_HEADER
-    {
-        public unsafe fixed byte Name[8];
-        public uint PhysicalAddressOrVirtualSize;
-        public uint VirtualAddress;
-        public uint SizeOfRawData;
-        public uint PointerToRawData;
-        public uint PointerToRelocations;
-        public uint PointerToLinenumbers;
-        public ushort NumberOfRelocations;
-        public ushort NumberOfLinenumbers;
-        public uint Characteristics;
-    }
 }

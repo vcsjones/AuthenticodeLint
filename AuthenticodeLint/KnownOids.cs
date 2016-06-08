@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace AuthenticodeLint
+﻿namespace AuthenticodeLint
 {
     public static class KnownOids
     {

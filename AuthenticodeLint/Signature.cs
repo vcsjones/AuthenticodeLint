@@ -168,7 +168,7 @@ namespace AuthenticodeLint
                     }
                     else if (attribute.Oid.Value == KnownOids.Rfc3161CounterSignature)
                     {
-                        signature = new Signature(value, SignatureKind.Rfc3161Signature);
+                        signature = new Signature(value, SignatureKind.Rfc3161Timestamp);
                     }
                     else if (attribute.Oid.Value == KnownOids.NestedSignatureOid)
                     {
@@ -275,7 +275,7 @@ namespace AuthenticodeLint
                     }
                     else if (attribute.Oid.Value == KnownOids.Rfc3161CounterSignature)
                     {
-                        signature = new Signature(value, SignatureKind.Rfc3161Signature);
+                        signature = new Signature(value, SignatureKind.Rfc3161Timestamp);
                     }
                     else if (attribute.Oid.Value == KnownOids.NestedSignatureOid)
                     {

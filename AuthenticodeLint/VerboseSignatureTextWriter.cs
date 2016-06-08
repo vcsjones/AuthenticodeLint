@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.IO;
-using System.Security.Cryptography.Pkcs;
-using System.Text;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace AuthenticodeLint
 {

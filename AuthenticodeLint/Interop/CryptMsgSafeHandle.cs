@@ -1,7 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
-
-namespace AuthenticodeLint.Interop
+﻿namespace AuthenticodeLint.Interop
 {
     internal class CryptMsgSafeHandle : Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
     {
