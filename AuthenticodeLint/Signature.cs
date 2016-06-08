@@ -190,11 +190,6 @@ namespace AuthenticodeLint
                     {
                         continue;
                     }
-                    var childAttributes = new CryptographicAttributeObjectCollection();
-                    foreach (var childAttribute in signature.UnsignedAttributes)
-                    {
-                        childAttributes.Add(childAttribute);
-                    }
                     list.Add(signature);
                 }
             }
@@ -311,11 +306,6 @@ namespace AuthenticodeLint
                     else
                     {
                         continue;
-                    }
-                    var childAttributes = new CryptographicAttributeObjectCollection();
-                    foreach (var childAttribute in signature.UnsignedAttributes)
-                    {
-                        childAttributes.Add(childAttribute);
                     }
                     list.Add(signature);
                 }
