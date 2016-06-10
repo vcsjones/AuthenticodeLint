@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AuthenticodeLint
 {
@@ -7,13 +8,23 @@ namespace AuthenticodeLint
     {
         public static IEnumerable<ISignature> VisitAll(this ISignature signature, SignatureKind kind)
         {
-            if ((signature.Kind & kind) > 0)
+            foreach (var nested in signature.GetNestedSignatures())
             {
-                yield return signature;
-            }
-            foreach (var nested in signature.GetNestedSignatures().VisitAll(kind))
-            {
-                yield return nested;
+                if ((nested.Kind & kind) > 0)
+                {
+                    yield return nested;
+                    foreach(var nestVisit in nested.VisitAll(kind))
+                    {
+                        yield return nestVisit;
+                    }
+                }
+                else if ((kind & SignatureKind.Deep) == SignatureKind.Deep)
+                {
+                    foreach (var nestVisit in nested.VisitAll(kind))
+                    {
+                        yield return nestVisit;
+                    }
+                }
             }
         }
 
@@ -25,7 +36,7 @@ namespace AuthenticodeLint
                 {
                     yield return signature;
                 }
-                foreach (var nested in signature.GetNestedSignatures().VisitAll(kind))
+                foreach (var nested in VisitAll(signature, kind))
                 {
                     yield return nested;
                 }
@@ -43,6 +54,7 @@ namespace AuthenticodeLint
         Rfc3161Timestamp = 0x8,
         AnySignature = NestedSignature | Signature,
         AnyCounterSignature = AuthenticodeTimestamp | Rfc3161Timestamp,
-        Any = AnySignature | AnyCounterSignature
+        Any = AnySignature | AnyCounterSignature,
+        Deep = 0x1000
     }
 }

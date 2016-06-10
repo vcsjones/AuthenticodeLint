@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AuthenticodeLint.Rules
 {
@@ -17,7 +18,7 @@ namespace AuthenticodeLint.Rules
             var pass = true;
             foreach (var signature in signatures)
             {
-                var counterSignatures = signature.VisitAll(SignatureKind.AnyCounterSignature);
+                var counterSignatures = signature.VisitAll(SignatureKind.AnyCounterSignature).ToList();
                 var isSigned = false;
                 var strongSign = false;
                 foreach (var counterSignature in counterSignatures)

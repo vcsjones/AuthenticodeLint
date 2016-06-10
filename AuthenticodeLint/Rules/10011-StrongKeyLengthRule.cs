@@ -15,7 +15,7 @@ namespace AuthenticodeLint.Rules
 
         public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var signatures = graph.VisitAll(SignatureKind.Any);
+            var signatures = graph.VisitAll(SignatureKind.Any | SignatureKind.Any);
             var result = RuleResult.Pass;
             foreach (var signature in signatures)
             {

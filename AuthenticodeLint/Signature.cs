@@ -121,6 +121,7 @@ namespace AuthenticodeLint
         public unsafe AuthenticodeSignature(AsnEncodedData data, ISignature owningSignature)
         {
             OwningSignature = owningSignature;
+            Kind = SignatureKind.AuthenticodeTimestamp;
             AdditionalCertificates = owningSignature.AdditionalCertificates;
             fixed (byte* dataPtr = data.RawData)
             {
