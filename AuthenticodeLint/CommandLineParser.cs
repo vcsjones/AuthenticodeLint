@@ -47,7 +47,7 @@ namespace AuthenticodeLint
                 }
                 else
                 {
-                    yield return new CommandLineParameter(parameterName.ToLowerInvariant(), token);
+                    yield return new CommandLineParameter(parameterName.ToLowerInvariant(), token.Trim('"'));
                     parameterName = null;
                 }
             }

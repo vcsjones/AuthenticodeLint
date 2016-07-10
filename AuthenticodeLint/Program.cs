@@ -9,12 +9,11 @@ namespace AuthenticodeLint
     {
         static int Main(string[] args)
         {
-
-            var commandLineRaw = string.Join(" ", args);
+            var cli = Environment.CommandLine;
             List<CommandLineParameter> parsedCommandLine;
             try
             {
-                var commandLine = CommandLineParser.LexCommandLine(commandLineRaw);
+                var commandLine = CommandLineParser.LexCommandLine(cli).Skip(1);
                 parsedCommandLine = CommandLineParser.CreateCommandLineParametersWithValues(commandLine).ToList();
             }
             catch(InvalidOperationException)
