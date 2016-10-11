@@ -23,7 +23,7 @@
 		<Exec Command="signtool.exe sign /d &quot;$(ProductName)&quot; /du $(ProductUrl) /n &quot;$(ProductCompanyName)&quot; /t http://timestamp.digicert.com /fd SHA1 &quot;@(ProjectOutputs)&quot;" />
 		<Exec Command="signtool.exe sign /as /d &quot;$(ProductName)&quot; /du $(ProductUrl) /n &quot;$(ProductCompanyName)&quot; /tr http://timestamp.digicert.com /fd SHA256 /td SHA256 &quot;@(ProjectOutputs)&quot;" />
         <!-- Run tool on itself -->
-        <Exec Command="&quot;@(ProjectOutputs)&quot; -in &quot;@(ProjectOutputs)&quot;" />
+        <Exec Command="&quot;@(ProjectOutputs)&quot; -in &quot;@(ProjectOutputs)&quot; -suppress 10012" />
 	</Target>
     <Target Name="Package" DependsOnTargets="Sign">
         <Zip InputDirectory="$(OutputDir)" OutputFile="$(OutZip)" />

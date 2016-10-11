@@ -59,7 +59,7 @@ namespace AuthenticodeLint
                         throw new NotSupportedException("Rule type is not supported.");
                     }
                 }
-                if (result != RuleResult.Pass)
+                if (result == RuleResult.Fail)
                 {
                     engineResult = RuleEngineResult.NotAllPass;
                 }
