@@ -11,6 +11,8 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Primary signature should be SHA1.";
 
+        public RuleSet RuleSet { get; } = RuleSet.Compat;
+
         public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             if (graph.Count == 0)

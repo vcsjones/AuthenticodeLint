@@ -46,17 +46,23 @@ namespace AuthenticodeLint
                     {
                         result = RuleResult.Skip;
                     }
-                    else if (rule is IAuthenticodeFileRule)
+                    else if ((rule.RuleSet & configuration.RuleSet) == 0)
                     {
-                        result = ((IAuthenticodeFileRule)rule).Validate(file, verboseWriter, configuration);
-                    }
-                    else if (rule is IAuthenticodeSignatureRule)
-                    {
-                        result = ((IAuthenticodeSignatureRule)rule).Validate(signatures, verboseWriter, configuration);
+                        result = RuleResult.Excluded;
                     }
                     else
                     {
-                        throw new NotSupportedException("Rule type is not supported.");
+                        switch (rule)
+                        {
+                            case IAuthenticodeFileRule fileRule:
+                                result = fileRule.Validate(file, verboseWriter, configuration);
+                                break;
+                            case IAuthenticodeSignatureRule sigRule:
+                                result = sigRule.Validate(signatures, verboseWriter, configuration);
+                                break;
+                            default:
+                                throw new NotSupportedException("Rule type is not supported.");
+                        }
                     }
                 }
                 if (result == RuleResult.Fail)

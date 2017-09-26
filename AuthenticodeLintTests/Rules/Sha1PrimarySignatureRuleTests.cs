@@ -8,7 +8,7 @@ namespace AuthenticodeLintTests.Rules
 {
     public class Sha1PrimarySignatureRuleTests
     {
-        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null);
+        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null, RuleSet.Compat);
 
         [
             Theory,

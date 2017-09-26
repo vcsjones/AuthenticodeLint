@@ -30,6 +30,8 @@
         public const string OpusInfo  = "1.3.6.1.4.1.311.2.1.12";
         public const string CodeSigning = "1.3.6.1.5.5.7.3.3";
         public const string NestedSignatureOid = "1.3.6.1.4.1.311.2.4.1";
+        public const string SealingSignature = "1.3.6.1.4.1.311.2.4.3";
+        public const string SealingTimestamp = "1.3.6.1.4.1.311.2.4.4";
         public const string KeyId = "1.3.6.1.4.1.311.10.7.1";
 
 

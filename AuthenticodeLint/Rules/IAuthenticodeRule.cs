@@ -7,6 +7,7 @@ namespace AuthenticodeLint.Rules
         int RuleId { get; }
         string ShortDescription { get; }
         string RuleName { get; }
+        RuleSet RuleSet { get; }
     }
 
     public interface IAuthenticodeSignatureRule : IAuthenticodeRule

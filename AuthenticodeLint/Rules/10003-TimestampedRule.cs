@@ -12,6 +12,8 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Signatures should have a timestamp counter signer.";
 
+        public RuleSet RuleSet { get; } = RuleSet.All;
+
         public unsafe RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll(SignatureKind.AnySignature);

@@ -8,12 +8,12 @@ namespace AuthenticodeLintTests.Rules
 {
     public class WinCertificatePaddingRuleTests
     {
-        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null);
+        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null, RuleSet.Modern);
 
         [Fact]
         public void PaddedExecutableShouldFail()
         {
-            var file = "../../inputs/wintrustpadded.ex_";
+            var file = "inputs/wintrustpadded.ex_";
             var rule = new WinCertificatePaddingRule();
             var logger = new MemorySignatureLogger();
 
@@ -26,7 +26,7 @@ namespace AuthenticodeLintTests.Rules
         [Fact]
         public void NonPaddedExecutableShouldPass()
         {
-            var file = "../../inputs/wintrustnonpadded.ex_";
+            var file = "inputs/wintrustnonpadded.ex_";
             var rule = new WinCertificatePaddingRule();
             var logger = new MemorySignatureLogger();
 
@@ -37,7 +37,7 @@ namespace AuthenticodeLintTests.Rules
         [Fact]
         public void PaddedLibraryShouldFail()
         {
-            var file = "../../inputs/wintrustpadded.dl_";
+            var file = "inputs/wintrustpadded.dl_";
             var rule = new WinCertificatePaddingRule();
             var logger = new MemorySignatureLogger();
 
@@ -50,7 +50,7 @@ namespace AuthenticodeLintTests.Rules
         [Fact]
         public void NonPaddedLibraryShouldPass()
         {
-            var file = "../../inputs/wintrustnonpadded.dl_";
+            var file = "inputs/wintrustnonpadded.dl_";
             var rule = new WinCertificatePaddingRule();
             var logger = new MemorySignatureLogger();
 
@@ -63,7 +63,7 @@ namespace AuthenticodeLintTests.Rules
         public void NonBinaryShouldThrow()
         {
             //Rules shouldn't handle non-signed, non-binary content since that validation happens further up.
-            var file = "../../inputs/nonbinary.txt";
+            var file = "inputs/nonbinary.txt";
             var rule = new WinCertificatePaddingRule();
 
             Assert.Throws<InvalidOperationException>(() => rule.Validate(file, SignatureLogger.Null, Configuration));

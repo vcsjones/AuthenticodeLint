@@ -4,6 +4,7 @@
     {
         Fail,
         Pass,
-        Skip
+        Skip,
+        Excluded
     }
 }

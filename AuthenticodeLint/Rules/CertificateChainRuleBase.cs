@@ -8,6 +8,7 @@ namespace AuthenticodeLint.Rules
         public abstract int RuleId { get; }
         public abstract string RuleName { get; }
         public abstract string ShortDescription { get; }
+        public abstract RuleSet RuleSet { get; }
 
         protected abstract bool ValidateChain(ISignature signer, X509Chain chain, SignatureLogger verboseWriter);
 

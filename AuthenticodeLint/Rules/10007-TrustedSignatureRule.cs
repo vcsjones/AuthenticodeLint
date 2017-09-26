@@ -12,6 +12,8 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Validates the file has correct signatures.";
 
+        public RuleSet RuleSet { get; } = RuleSet.All;
+
         public unsafe RuleResult Validate(string file, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var pathPtr = Marshal.StringToHGlobalUni(file);

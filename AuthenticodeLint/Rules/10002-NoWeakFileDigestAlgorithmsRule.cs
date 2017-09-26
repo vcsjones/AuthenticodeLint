@@ -10,6 +10,8 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks for weak file digest algorithms.";
 
+        public RuleSet RuleSet { get; } = RuleSet.All;
+        
         public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll(SignatureKind.AnySignature | SignatureKind.Deep);

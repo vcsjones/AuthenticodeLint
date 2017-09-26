@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AuthenticodeLint": {
+      "commandName": "Project",
+      "commandLineArgs": "-in \"C:\\dev\\Personal\\AuthenticodeLint\\out\\authlint.exe\""
+    }
+  }
+}

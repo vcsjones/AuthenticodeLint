@@ -15,6 +15,8 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Validates the maximum key length of a signing certificate.";
 
+        public RuleSet RuleSet { get; } = RuleSet.All;
+
         public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll(SignatureKind.Any | SignatureKind.Deep);

@@ -7,7 +7,7 @@ namespace AuthenticodeLintTests.Rules
 {
     public class PublisherInformationPresentRuleTests
     {
-        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null);
+        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null, RuleSet.Modern);
 
         private static IReadOnlyList<ISignature> GetGraphForFile(string file)
         {
@@ -18,7 +18,7 @@ namespace AuthenticodeLintTests.Rules
         [Fact]
         public void ShouldFailWhenNoPublisherInformation()
         {
-            var signature = GetGraphForFile("../../inputs/pubinfonoexist.ex_");
+            var signature = GetGraphForFile("inputs/pubinfonoexist.ex_");
             var rule = new PublisherInformationPresentRule();
             var logger = new MemorySignatureLogger();
 
@@ -30,7 +30,7 @@ namespace AuthenticodeLintTests.Rules
         [Fact]
         public void ShouldFailWhenNoPublisherURL()
         {
-            var signature = GetGraphForFile("../../inputs/pubinfohasdescription.ex_");
+            var signature = GetGraphForFile("inputs/pubinfohasdescription.ex_");
             var rule = new PublisherInformationPresentRule();
             var logger = new MemorySignatureLogger();
 
@@ -42,7 +42,7 @@ namespace AuthenticodeLintTests.Rules
         [Fact]
         public void ShouldFailWhenNoPublisherDescription()
         {
-            var signature = GetGraphForFile("../../inputs/pubinfohasurl.ex_");
+            var signature = GetGraphForFile("inputs/pubinfohasurl.ex_");
             var rule = new PublisherInformationPresentRule();
             var logger = new MemorySignatureLogger();
 
@@ -54,7 +54,7 @@ namespace AuthenticodeLintTests.Rules
         [Fact]
         public void ShouldFailWhenUrlIsBogus()
         {
-            var signature = GetGraphForFile("../../inputs/pubinfohasbogusurl.ex_");
+            var signature = GetGraphForFile("inputs/pubinfohasbogusurl.ex_");
             var rule = new PublisherInformationPresentRule();
             var logger = new MemorySignatureLogger();
 
@@ -67,7 +67,7 @@ namespace AuthenticodeLintTests.Rules
         [Fact]
         public void ShouldPassWhenUrlAndDescriptionPresent()
         {
-            var signature = GetGraphForFile("../../inputs/pubinfovalid.ex_");
+            var signature = GetGraphForFile("inputs/pubinfovalid.ex_");
             var rule = new PublisherInformationPresentRule();
             var logger = new MemorySignatureLogger();
 

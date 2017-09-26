@@ -12,11 +12,15 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks for the presence of unsigned attributes with unknown an OID.";
 
+        public RuleSet RuleSet { get; } = RuleSet.All;
+
         private static string[] _trustedUnsignedAttributes = new[]
         {
             KnownOids.AuthenticodeCounterSignature,
             KnownOids.Rfc3161CounterSignature,
-            KnownOids.NestedSignatureOid
+            KnownOids.NestedSignatureOid,
+            KnownOids.SealingSignature,
+            KnownOids.SealingTimestamp
         };
 
         public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)

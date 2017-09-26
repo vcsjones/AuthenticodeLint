@@ -13,8 +13,9 @@ namespace AuthenticodeLint
         public bool Verbose { get; }
         public RevocationChecking RevocationMode {get;}
         public string ExtractPath { get; }
+        public RuleSet RuleSet { get; }
 
-        public CheckConfiguration(IReadOnlyList<string> inputPaths, string reportPath, bool quiet, HashSet<int> suppressErrorIDs, bool verbose, RevocationChecking revocationMode, string extract)
+        public CheckConfiguration(IReadOnlyList<string> inputPaths, string reportPath, bool quiet, HashSet<int> suppressErrorIDs, bool verbose, RevocationChecking revocationMode, string extract, RuleSet ruleSet)
         {
             InputPaths = inputPaths;
             ReportPath = reportPath;
@@ -23,6 +24,7 @@ namespace AuthenticodeLint
             Verbose = verbose;
             RevocationMode = revocationMode;
             ExtractPath = extract;
+            RuleSet = ruleSet;
         }
     }
 

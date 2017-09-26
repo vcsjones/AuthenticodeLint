@@ -35,6 +35,7 @@ namespace AuthenticodeLint
             string report = null;
             string extract = null;
             var revocation = RevocationChecking.None;
+            var ruleSet = RuleSet.Modern;
             foreach(var parameter in parsedCommandLine)
             {
                 if (parameter.Name == "in")
@@ -121,6 +122,19 @@ namespace AuthenticodeLint
                         return ExitCodes.InvalidInputOrConfig;
                     }
                 }
+                else if (parameter.Name == "ruleset")
+                {
+                    if (string.IsNullOrWhiteSpace(parameter.Value))
+                    {
+                        Console.Error.WriteLine($"-{parameter.Name} requires a value if specified.");
+                        return ExitCodes.InvalidInputOrConfig;
+                    }
+                    if (!Enum.TryParse(parameter.Value, true, out ruleSet) || parameter.Value.Equals("all", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Console.Error.WriteLine($"-{parameter.Value} is an unrecognized ruleset.");
+                        return ExitCodes.InvalidInputOrConfig;
+                    }
+                }
                 else
                 {
                     Console.Error.WriteLine($"-{parameter.Name} is an unknown parameter.");
@@ -132,7 +146,7 @@ namespace AuthenticodeLint
                 Console.Error.WriteLine("Input is expected. See -help for usage.");
                 return ExitCodes.InvalidInputOrConfig;
             }
-            var configuration = new CheckConfiguration(inputs, report, quiet, suppress, verbose, revocation, extract);
+            var configuration = new CheckConfiguration(inputs, report, quiet, suppress, verbose, revocation, extract, ruleSet);
 
             if (!ConfigurationValidator.ValidateAndPrint(configuration, Console.Error))
             {
@@ -178,6 +192,8 @@ Usage: authlint.exe -in ""C:\path to an\executable.exe""
     -verbose:       Show verbose output. Cannot be combined with -quiet.
     -revocation:    Specify how revocation checking is done. Valid values are none, offline, online. None is the default.
     -extract:       Extracts all signature information to the specified directory.
+    -ruleset:       A set of rules to run. By intended behavior, such as modern signing, or compatibility.
+                    Possible values are ""compat"" and ""modern"", where the default is ""modern"". Optional.
 
 Exit codes:
 

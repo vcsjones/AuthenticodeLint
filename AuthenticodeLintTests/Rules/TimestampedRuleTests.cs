@@ -7,7 +7,7 @@ namespace AuthenticodeLintTests.Rules
 {
     public class TimestampedRuleTests
     {
-        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null);
+        private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null, RuleSet.Modern);
 
         private static IReadOnlyList<ISignature> GetGraphForFile(string file)
         {
@@ -17,8 +17,8 @@ namespace AuthenticodeLintTests.Rules
 
         [
             Theory,
-            InlineData("../../inputs/notimestamp.ex_"),
-            InlineData("../../inputs/notimestamp.dl_")
+            InlineData("inputs/notimestamp.ex_"),
+            InlineData("inputs/notimestamp.dl_")
         ]
         public void ShouldFailIfNoTimestamp(string file)
         {
@@ -34,7 +34,7 @@ namespace AuthenticodeLintTests.Rules
         [Fact]
         public void ShouldFailIfTimestampUsesWeakSignatureAlgorithm()
         {
-            var signatures = GetGraphForFile("../../inputs/timestampedweaksig.ex_");
+            var signatures = GetGraphForFile("inputs/timestampedweaksig.ex_");
             var rule = new TimestampedRule();
 
             var logger = new MemorySignatureLogger();
@@ -46,7 +46,7 @@ namespace AuthenticodeLintTests.Rules
         [Fact]
         public void ShouldPassIfTimestampedAlgorithmIsValid()
         {
-            var signatures = GetGraphForFile("../../inputs/timestampedvalid.ex_");
+            var signatures = GetGraphForFile("inputs/timestampedvalid.ex_");
             var rule = new TimestampedRule();
 
             var logger = new MemorySignatureLogger();

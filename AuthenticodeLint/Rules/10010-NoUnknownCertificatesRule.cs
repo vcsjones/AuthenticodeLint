@@ -12,6 +12,8 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks for unknown embedded certificates.";
 
+        public RuleSet RuleSet { get; } = RuleSet.All;
+
         public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var result = RuleResult.Pass;

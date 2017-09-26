@@ -20,10 +20,11 @@
 		</MSBuild>
 	</Target>
 	<Target Name="Sign" DependsOnTargets="Build">
-		<Exec Command="signtool.exe sign /d &quot;$(ProductName)&quot; /du $(ProductUrl) /n &quot;$(ProductCompanyName)&quot; /t http://timestamp.digicert.com /fd SHA1 &quot;@(ProjectOutputs)&quot;" />
-		<Exec Command="signtool.exe sign /as /d &quot;$(ProductName)&quot; /du $(ProductUrl) /n &quot;$(ProductCompanyName)&quot; /tr http://timestamp.digicert.com /fd SHA256 /td SHA256 &quot;@(ProjectOutputs)&quot;" />
+		<Exec Command="signtool.exe sign /sha1 58D78D4D87C80E090A3E453E5039C1DCD464E7A3 /d &quot;$(ProductName)&quot; /du $(ProductUrl) /n &quot;$(ProductCompanyName)&quot; /ph /itos /t http://timestamp.digicert.com /fd SHA1 &quot;$(OutputDir)\authlint.exe&quot;" IgnoreExitCode="true" />
+		<Exec Command="signtool.exe sign /sha1 58D78D4D87C80E090A3E453E5039C1DCD464E7A3 /as /d &quot;$(ProductName)&quot; /du $(ProductUrl) /n &quot;$(ProductCompanyName)&quot; /itos /ph /tr http://timestamp.digicert.com /fd SHA256 /td SHA256 &quot;$(OutputDir)\authlint.exe&quot;" IgnoreExitCode="true" />
+		<Exec Command="signtool.exe sign /sha1 58D78D4D87C80E090A3E453E5039C1DCD464E7A3 /seal /tseal http://timestamp.digicert.com /td SHA256 &quot;$(OutputDir)\authlint.exe&quot;" />
         <!-- Run tool on itself -->
-        <Exec Command="&quot;@(ProjectOutputs)&quot; -in &quot;@(ProjectOutputs)&quot; -suppress 10012" />
+        <Exec Command="&quot;$(OutputDir)\authlint.exe&quot; -in &quot;$(OutputDir)\authlint.exe&quot;" />
 	</Target>
     <Target Name="Package" DependsOnTargets="Sign">
         <Zip InputDirectory="$(OutputDir)" OutputFile="$(OutZip)" />

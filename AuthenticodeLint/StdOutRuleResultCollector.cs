@@ -26,6 +26,9 @@ namespace AuthenticodeLint
                 case RuleResult.Skip:
                     Console.Out.WriteLine($"\tRule #{rule.RuleId} \"{rule.RuleName}\" was skipped because it was suppressed.");
                     break;
+                case RuleResult.Excluded:
+                    Console.Out.WriteLine($"\tRule #{rule.RuleId} \"{rule.RuleName}\" was excluded because it is not part of the ruleset.");
+                    break;
                 case RuleResult.Fail:
                     Console.Out.WriteLine($"\tRule #{rule.RuleId} \"{rule.RuleName}\" failed.");
                     break;

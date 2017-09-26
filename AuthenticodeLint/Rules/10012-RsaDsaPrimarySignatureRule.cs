@@ -12,6 +12,8 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Primary signature should be RSA or DSA.";
 
+        public RuleSet RuleSet { get; } = RuleSet.All;
+
         public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var primary = graph.SingleOrDefault();

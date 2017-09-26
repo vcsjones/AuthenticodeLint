@@ -11,6 +11,8 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Checks for non-zero data after the signature.";
 
+        public RuleSet RuleSet { get; } = RuleSet.All;
+
         public RuleResult Validate(string file, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var padding = CertificatePaddingExtractor.ExtractPadding(file);

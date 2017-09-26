@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.Pkcs;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Cryptography.X509Certificates;
 
 namespace AuthenticodeLint.Rules
 {
@@ -11,6 +10,8 @@ namespace AuthenticodeLint.Rules
 
         public override string ShortDescription { get; } = "Checks the signing certificate's and chain's signature algorithm.";
 
+        public override RuleSet RuleSet { get; } = RuleSet.All;
+        
         protected override bool ValidateChain(ISignature signer, X509Chain chain, SignatureLogger verboseWriter)
         {
             return ValidateStrongChain(signer, chain, verboseWriter);
