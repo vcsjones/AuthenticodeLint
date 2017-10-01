@@ -3,10 +3,11 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>authlint</AssemblyName>
     <TargetFrameworks>net461</TargetFrameworks>
-    <VersionPrefix>0.10.0</VersionPrefix>
+    <VersionPrefix>0.11.0</VersionPrefix>
     <Authors>Kevin Jones</Authors>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Copyright>Kevin Jones 2016-2017</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Security" />
