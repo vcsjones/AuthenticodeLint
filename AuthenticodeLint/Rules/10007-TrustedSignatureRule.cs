@@ -1,7 +1,4 @@
 ﻿using AuthenticodeExaminer;
-using AuthenticodeLint.Interop;
-using System;
-using System.Runtime.InteropServices;
 
 namespace AuthenticodeLint.Rules
 {
@@ -15,7 +12,7 @@ namespace AuthenticodeLint.Rules
 
         public RuleSet RuleSet { get; } = RuleSet.All;
 
-        public unsafe RuleResult Validate(string file, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(string file, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var inspector = new FileInspector(file);
             var result = inspector.Validate(configuration.RevocationMode);
@@ -23,6 +20,7 @@ namespace AuthenticodeLint.Rules
             {
                 return RuleResult.Pass;
             }
+            verboseWriter.LogMessage($"Authenticode signature validation failed with '{result}'.");
             return RuleResult.Fail;
         }
     }

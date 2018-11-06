@@ -1,9 +1,13 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Collections.Concurrent;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace AuthenticodeLint
 {
     public static class BitStrengthCalculator
     {
+        private static ConcurrentDictionary<string, int> _cachedEccCurveSizes = new ConcurrentDictionary<string, int>();
+
         public static CertificateBitStrength CalculateStrength(X509Certificate2 certificate)
         {
             PublicKeyAlgorithm keyAlgorithm;
@@ -11,26 +15,16 @@ namespace AuthenticodeLint
             switch (certificate.PublicKey.Oid.Value)
             {
                 case KnownOids.X509Algorithms.Ecc:
+                    keyAlgorithm = PublicKeyAlgorithm.ECDSA;
                     var parameterOid = OidParser.ReadFromBytes(certificate.PublicKey.EncodedParameters.RawData);
-                    switch (parameterOid.Value)
+                    bitSize = _cachedEccCurveSizes.GetOrAdd(parameterOid.Value, oid =>
                     {
-                        case KnownOids.EccCurves.EcdsaP256:
-                            keyAlgorithm = PublicKeyAlgorithm.ECDSA;
-                            bitSize = 256;
-                            break;
-                        case KnownOids.EccCurves.EcdsaP384:
-                            keyAlgorithm = PublicKeyAlgorithm.ECDSA;
-                            bitSize = 384;
-                            break;
-                        case KnownOids.EccCurves.EcdsaP521:
-                            keyAlgorithm = PublicKeyAlgorithm.ECDSA;
-                            bitSize = 521;
-                            break;
-                        default:
-                            keyAlgorithm = PublicKeyAlgorithm.Other;
-                            bitSize = null;
-                            break;
-                    }
+                        var curve = ECCurve.CreateFromValue(oid);
+                        using (var ecdsa = ECDsa.Create(curve))
+                        {
+                            return ecdsa.KeySize;
+                        }
+                    });
                     break;
                 case KnownOids.X509Algorithms.RSA:
                     keyAlgorithm = PublicKeyAlgorithm.RSA;

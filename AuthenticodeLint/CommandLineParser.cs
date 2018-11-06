@@ -7,7 +7,7 @@ namespace AuthenticodeLint
 
     public readonly struct CommandLineParameter
     {
-        private  readonly string _name, _value;
+        private readonly string _name, _value;
 
         public CommandLineParameter(string name, string value)
         {

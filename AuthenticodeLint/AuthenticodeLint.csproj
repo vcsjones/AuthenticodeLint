@@ -1,18 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AssemblyName>authlint</AssemblyName>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <VersionPrefix>0.11.0</VersionPrefix>
     <Authors>Kevin Jones</Authors>
-    <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Copyright>Kevin Jones 2016-2017</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AuthenticodeExaminer" Version="0.3.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Security" />
   </ItemGroup>
 </Project>

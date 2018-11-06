@@ -29,7 +29,7 @@ namespace AuthenticodeLint.Rules
                         break;
                     }
                 }
-                if (info == null)
+                if (info == null || info.IsEmpty)
                 {
                     result = RuleResult.Fail;
                     verboseWriter.LogSignatureMessage(signature, "Signature does not have any publisher information.");

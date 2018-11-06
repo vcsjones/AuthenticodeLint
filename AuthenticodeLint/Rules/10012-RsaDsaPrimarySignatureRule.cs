@@ -12,7 +12,7 @@ namespace AuthenticodeLint.Rules
 
         public string ShortDescription { get; } = "Primary signature should be RSA or DSA.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet { get; } = RuleSet.Compat;
 
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
@@ -25,7 +25,7 @@ namespace AuthenticodeLint.Rules
             var info = BitStrengthCalculator.CalculateStrength(primary.Certificate);
             if (info.AlgorithmName != PublicKeyAlgorithm.RSA && info.AlgorithmName != PublicKeyAlgorithm.DSA)
             {
-                verboseWriter.LogSignatureMessage(primary, $"Primary signature should use RSA or DSA key but uses ${info.AlgorithmName.ToString()}");
+                verboseWriter.LogSignatureMessage(primary, $"Primary signature should use RSA or DSA key but uses {info.AlgorithmName.ToString()}");
                 return RuleResult.Fail;
             }
             return RuleResult.Pass;

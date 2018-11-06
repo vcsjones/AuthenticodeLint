@@ -1,5 +1,5 @@
 ﻿using AuthenticodeExaminer;
-using AuthenticodeLint.Interop;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
@@ -41,19 +41,20 @@ namespace AuthenticodeLint
 
         private static string SerializeCertificate(X509Certificate2 certificate)
         {
-            string base64Certificate = null;
-            var binaryCertificate = certificate.Export(X509ContentType.Cert);
-
-            uint size = 0;
-            if (Crypt32.CryptBinaryToString(binaryCertificate, (uint)binaryCertificate.Length, CryptBinaryToStringFlags.CRYPT_STRING_BASE64HEADER, null, ref size))
+            var octets = certificate.Export(X509ContentType.Cert);
+            var formatted = Convert.ToBase64String(octets);
+            var builder = new StringBuilder();
+            builder.AppendLine("-----BEGIN CERTIFICATE-----");
+            var i = 0;
+            while (i < formatted.Length)
             {
-                var builder = new StringBuilder((int)size);
-                if (Crypt32.CryptBinaryToString(binaryCertificate, (uint)binaryCertificate.Length, CryptBinaryToStringFlags.CRYPT_STRING_BASE64HEADER, builder, ref size))
-                {
-                    base64Certificate = builder.ToString();
-                }
+                const int MAX_LINE_SIZE = 64;
+                var size = Math.Min(MAX_LINE_SIZE, formatted.Length - i);
+                builder.AppendLine(formatted.Substring(i, size));
+                i += size;
             }
-            return base64Certificate; 
+            builder.AppendLine("-----END CERTIFICATE-----");
+            return builder.ToString();
         }
     }
 }

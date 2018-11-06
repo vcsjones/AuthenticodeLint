@@ -32,10 +32,10 @@ namespace AuthenticodeLint
                         using (var memoryStream = new MemoryStream())
                         {
                             int read;
-                            var buffer = new byte[0x1000];
-                            while ((read = reader.Read(buffer, 0, buffer.Length)) > 0)
+                            Span<byte> buffer = stackalloc byte[0x400];
+                            while ((read = reader.Read(buffer)) > 0)
                             {
-                                memoryStream.Write(buffer, 0, read);
+                                memoryStream.Write(buffer.Slice(0, read));
                             }
                             var winCertificate = memoryStream.ToArray();
                             var signer = new SignedCms();

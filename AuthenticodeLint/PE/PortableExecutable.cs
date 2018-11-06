@@ -1,10 +1,8 @@
 ﻿using AuthenticodeLint.Interop;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace AuthenticodeLint.PE
@@ -15,15 +13,14 @@ namespace AuthenticodeLint.PE
 
         public PortableExecutable(string filePath)
         {
-            _file = MemoryMappedFile.CreateFromFile(filePath, System.IO.FileMode.Open, "PortableExecutableView", 0, MemoryMappedFileAccess.Read);
+            _file = MemoryMappedFile.CreateFromFile(filePath, FileMode.Open, "PortableExecutableView", 0, MemoryMappedFileAccess.Read);
         }
 
         public DosHeader GetDosHeader()
         {
             using (var view = _file.CreateViewAccessor(0, 0, MemoryMappedFileAccess.Read))
             {
-                IMAGE_DOS_HEADER header;
-                view.Read(0L, out header);
+                view.Read(0L, out IMAGE_DOS_HEADER header);
                 if (header.e_magic != DOS_MAGIC)
                 {
                     throw new InvalidOperationException("File does not have a valid DOS header.");
@@ -45,12 +42,10 @@ namespace AuthenticodeLint.PE
                 {
                     throw new InvalidOperationException("File does not have a valid PE header.");
                 }
-                IMAGE_FILE_HEADER fileHeader;
-                view.Read(sizeof(uint), out fileHeader);
+                view.Read(sizeof(uint), out IMAGE_FILE_HEADER fileHeader);
                 if (fileHeader.Machine == IMAGE_FILE_MACHINE_AMD64)
                 {
-                    IMAGE_OPTIONAL_HEADER64 header64;
-                    view.Read(sizeof(uint) + Marshal.SizeOf<IMAGE_FILE_HEADER>(), out header64);
+                    view.Read(sizeof(uint) + Marshal.SizeOf<IMAGE_FILE_HEADER>(), out IMAGE_OPTIONAL_HEADER64 header64);
                     if (header64.Magic != PE32_64)
                     {
                         throw new InvalidOperationException("File is x86-64 but has a image type other than PE32+.");
@@ -61,8 +56,7 @@ namespace AuthenticodeLint.PE
                 }
                 else if (fileHeader.Machine == IMAGE_FILE_MACHINE_I386)
                 {
-                    IMAGE_OPTIONAL_HEADER32 header32;
-                    view.Read(sizeof(uint) + Marshal.SizeOf<IMAGE_FILE_HEADER>(), out header32);
+                    view.Read(sizeof(uint) + Marshal.SizeOf<IMAGE_FILE_HEADER>(), out IMAGE_OPTIONAL_HEADER32 header32);
                     if (header32.Magic != PE32_32)
                     {
                         throw new InvalidOperationException("File is x86 but has a image type other than PE32.");

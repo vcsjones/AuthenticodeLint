@@ -34,6 +34,8 @@ namespace AuthenticodeLint.Rules
                         verboseWriter.LogSignatureMessage(signature, $"Signature uses ECDSA signature with a key size of {keyInfo.BitSize} exeeding maximum size of {MAX_ECDSA_KEY_SIZE}.");
                         result = RuleResult.Fail;
                         break;
+                    case PublicKeyAlgorithm.ECDSA:
+                        break;
                     case PublicKeyAlgorithm.RSA when keyInfo.BitSize is null:
                         verboseWriter.LogSignatureMessage(signature, "Signature has an unknown RSA key size.");
                         result = RuleResult.Fail;
@@ -42,6 +44,8 @@ namespace AuthenticodeLint.Rules
                         verboseWriter.LogSignatureMessage(signature, $"Signature uses RSA signature with a key size of {keyInfo.BitSize} exeeding maximum size of {MAX_RSA_KEY_SIZE}.");
                         result = RuleResult.Fail;
                         break;
+                    case PublicKeyAlgorithm.RSA:
+                        break;
                     case PublicKeyAlgorithm.DSA when keyInfo.BitSize is null:
                         verboseWriter.LogSignatureMessage(signature, "Signature has an unknown DSA key size.");
                         result = RuleResult.Fail;
@@ -49,6 +53,8 @@ namespace AuthenticodeLint.Rules
                     case PublicKeyAlgorithm.DSA when keyInfo.BitSize > MAX_DSA_KEY_SIZE:
                         verboseWriter.LogSignatureMessage(signature, $"Signature uses DSA signature with a key size of {keyInfo.BitSize} exeeding maximum size of {MAX_DSA_KEY_SIZE}.");
                         result = RuleResult.Fail;
+                        break;
+                    case PublicKeyAlgorithm.DSA:
                         break;
                     default:
                         verboseWriter.LogSignatureMessage(signature, $"Signature uses an unknown algorithm.");

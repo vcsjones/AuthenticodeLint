@@ -1,27 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
     <AssemblyName>AuthenticodeLint.Tests</AssemblyName>
     <PackageId>AuthenticodeLint.Tests</PackageId>
     <VersionPrefix>0.1.0</VersionPrefix>
     <Authors>Kevin Jones</Authors>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta5-build3769" />
 
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="xunit" Version="2.3.0-beta5-build3769" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta5-build3769" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4" />
 
     <ProjectReference Include="..\AuthenticodeLint\AuthenticodeLint.csproj" />
-
-    <Reference Include="System.Security" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <ItemGroup>
     <None Update="inputs\*">

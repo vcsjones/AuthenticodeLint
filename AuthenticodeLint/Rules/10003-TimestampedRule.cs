@@ -15,7 +15,7 @@ namespace AuthenticodeLint.Rules
 
         public RuleSet RuleSet { get; } = RuleSet.All;
 
-        public unsafe RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll(SignatureKind.AnySignature);
             var pass = true;
