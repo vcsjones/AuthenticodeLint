@@ -24,41 +24,28 @@ namespace AuthenticodeLint.Rules
                 var keyInfo = BitStrengthCalculator.CalculateStrength(signature.Certificate);
                 switch (keyInfo.AlgorithmName)
                 {
-                    case PublicKeyAlgorithm.ECDSA:
-                        if (keyInfo.BitSize == null)
-                        {
-                            verboseWriter.LogSignatureMessage(signature, "Signature uses ECDSA with an unknown curve.");
-                            result = RuleResult.Fail;
-                        }
+                    case PublicKeyAlgorithm.ECDSA when keyInfo.BitSize is null:
+                        verboseWriter.LogSignatureMessage(signature, "Signature uses ECDSA with an unknown curve.");
+                        result = RuleResult.Fail;
                         //We don't actually check the key size for ECDSA since all known values are acceptable.
                         break;
-                    case PublicKeyAlgorithm.RSA:
-                        if (keyInfo.BitSize == null)
-                        {
-                            verboseWriter.LogSignatureMessage(signature, "Signature has an unknown RSA key size.");
-                            result = RuleResult.Fail;
-                        }
-                        else if (keyInfo.BitSize < MIN_RSADSA_KEY_SIZE)
-                        {
-                            verboseWriter.LogSignatureMessage(signature, $"Signature uses a RSA key of size {keyInfo.BitSize} which is below the recommended {MIN_RSADSA_KEY_SIZE}.");
-                            result = RuleResult.Fail;
-                        }
+                    case PublicKeyAlgorithm.RSA when keyInfo.BitSize is null:
+                        verboseWriter.LogSignatureMessage(signature, "Signature has an unknown RSA key size.");
+                        result = RuleResult.Fail;
                         break;
-                    case PublicKeyAlgorithm.DSA:
-                        if (keyInfo.BitSize == null)
-                        {
-                            verboseWriter.LogSignatureMessage(signature, "Signature has an unknown DSA key size.");
-                            result = RuleResult.Fail;
-                        }
-                        else if (keyInfo.BitSize < MIN_RSADSA_KEY_SIZE)
-                        {
-                            //Effectively, 1024 is the max for a DSA key, so this will likely always fail.
-                            verboseWriter.LogSignatureMessage(signature, $"Signature uses a DSA key of size {keyInfo.BitSize} which is below the recommended {MIN_RSADSA_KEY_SIZE}.");
-                            result = RuleResult.Fail;
-                        }
+                    case PublicKeyAlgorithm.RSA when keyInfo.BitSize < MIN_RSADSA_KEY_SIZE:
+                        verboseWriter.LogSignatureMessage(signature, $"Signature uses a RSA key of size {keyInfo.BitSize} which is below the recommended {MIN_RSADSA_KEY_SIZE}.");
+                        result = RuleResult.Fail;
                         break;
-                    case PublicKeyAlgorithm.Other:
-                        goto default;
+                    case PublicKeyAlgorithm.DSA when keyInfo.BitSize is null:
+                        verboseWriter.LogSignatureMessage(signature, "Signature has an unknown DSA key size.");
+                        result = RuleResult.Fail;
+                        break;
+                    case PublicKeyAlgorithm.DSA when keyInfo.BitSize < MIN_RSADSA_KEY_SIZE:
+                        //Effectively, 1024 is the max for a DSA key, so this will likely always fail.
+                        verboseWriter.LogSignatureMessage(signature, $"Signature uses a DSA key of size {keyInfo.BitSize} which is below the recommended {MIN_RSADSA_KEY_SIZE}.");
+                        result = RuleResult.Fail;
+                        break;
                     default:
                         verboseWriter.LogSignatureMessage(signature, $"Signature uses an unknown algorithm.");
                         result = RuleResult.Fail;

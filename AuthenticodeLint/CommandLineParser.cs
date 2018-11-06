@@ -5,9 +5,9 @@ using System.Linq;
 namespace AuthenticodeLint
 {
 
-    public struct CommandLineParameter
+    public readonly struct CommandLineParameter
     {
-        private string _name, _value;
+        private  readonly string _name, _value;
 
         public CommandLineParameter(string name, string value)
         {
