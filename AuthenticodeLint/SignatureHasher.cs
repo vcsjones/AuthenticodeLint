@@ -1,11 +1,12 @@
-﻿using System.Linq;
+﻿using AuthenticodeExaminer;
+using System.Linq;
 using System.Text;
 
 namespace AuthenticodeLint
 {
     public static class HashHelpers
     {
-        public static string GetHashForSignature(ISignature signature)
+        public static string GetHashForSignature(ICmsSignature signature)
         {
             var digest = signature.SignatureDigest();
             var digestString = digest.Aggregate(new StringBuilder(), (acc, b) => acc.AppendFormat("{0:x2}", b)).ToString();

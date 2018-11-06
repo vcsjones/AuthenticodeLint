@@ -1,4 +1,5 @@
-﻿using AuthenticodeLint;
+﻿using AuthenticodeExaminer;
+using AuthenticodeLint;
 using AuthenticodeLint.Rules;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -27,7 +28,7 @@ namespace AuthenticodeLintTests.Rules
             };
             var check = new Sha1PrimarySignatureRule();
             var logger = new MemorySignatureLogger();
-            var result = check.Validate(new List<ISignature> { signature }, logger, Configuration);
+            var result = check.Validate(new List<ICmsSignature> { signature }, logger, Configuration);
             Assert.Equal(RuleResult.Fail, result);
             Assert.Contains($"Signature 000102030405060708090a: Expected {nameof(KnownOids.SHA1)} digest algorithm but is {algorithm.FriendlyName}.", logger.Messages);
         }
@@ -42,7 +43,7 @@ namespace AuthenticodeLintTests.Rules
             };
             var check = new Sha1PrimarySignatureRule();
             var logger = new MemorySignatureLogger();
-            var result = check.Validate(new List<ISignature> { signature }, logger, Configuration);
+            var result = check.Validate(new List<ICmsSignature> { signature }, logger, Configuration);
             Assert.Equal(RuleResult.Pass, result);
             Assert.Empty(logger.Messages);
         }
@@ -61,7 +62,7 @@ namespace AuthenticodeLintTests.Rules
             };
             var check = new Sha1PrimarySignatureRule();
             var logger = new MemorySignatureLogger();
-            var result = check.Validate(new List<ISignature> { signature1, signature2 }, logger, Configuration);
+            var result = check.Validate(new List<ICmsSignature> { signature1, signature2 }, logger, Configuration);
             Assert.Equal(RuleResult.Fail, result);
             Assert.Contains("Multiple primary signatures exist.", logger.Messages);
 

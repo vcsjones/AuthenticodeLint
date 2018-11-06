@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using AuthenticodeExaminer;
 
 namespace AuthenticodeLint.Rules
 {
@@ -14,12 +15,12 @@ namespace AuthenticodeLint.Rules
 
         public RuleSet RuleSet { get; } = RuleSet.All;
 
-        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var result = RuleResult.Pass;
             //We exclude Authenticode timestamps because they cannot contain "additional" certificates but rather
             //Use their parent. Including Authenticode timestamps will produce duplicate warnings.
-            var signatures = graph.VisitAll(SignatureKind.AnySignature | SignatureKind.Rfc3161Timestamp | SignatureKind.Deep);
+            var signatures = graph.VisitAll(SignatureKind.AnySignature | SignatureKind.Rfc3161Timestamp, deep: true);
             foreach (var signature in signatures)
             {
                 var allEmbeddedCertificates = signature.AdditionalCertificates.Cast<X509Certificate2>().ToList();

@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography.X509Certificates;
+using AuthenticodeExaminer;
 
 namespace AuthenticodeLint.Rules
 {
@@ -12,12 +13,12 @@ namespace AuthenticodeLint.Rules
 
         public override RuleSet RuleSet { get; } = RuleSet.All;
         
-        protected override bool ValidateChain(ISignature signer, X509Chain chain, SignatureLogger verboseWriter)
+        protected override bool ValidateChain(ICmsSignature signer, X509Chain chain, SignatureLogger verboseWriter)
         {
             return ValidateStrongChain(signer, chain, verboseWriter);
         }
 
-        private static bool ValidateStrongChain(ISignature signature, X509Chain chain, SignatureLogger verboseWriter)
+        private static bool ValidateStrongChain(ICmsSignature signature, X509Chain chain, SignatureLogger verboseWriter)
         {
             var signatureStrength = GetHashStrenghForComparison(signature.DigestAlgorithm.Value);
             var strongShaChain = true;

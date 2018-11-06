@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AuthenticodeExaminer;
 
 namespace AuthenticodeLint.Rules
 {
@@ -15,7 +16,7 @@ namespace AuthenticodeLint.Rules
 
         public RuleSet RuleSet { get; } = RuleSet.All;
 
-        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll(SignatureKind.Any | SignatureKind.Any);
             var result = RuleResult.Pass;
