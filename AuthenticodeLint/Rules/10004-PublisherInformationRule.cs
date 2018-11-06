@@ -49,8 +49,7 @@ namespace AuthenticodeLint.Rules
                     }
                     else
                     {
-                        Uri uri;
-                        if (!Uri.TryCreate(info.UrlLink, UriKind.Absolute, out uri))
+                        if (!Uri.TryCreate(info.UrlLink, UriKind.Absolute, out _))
                         {
                             result = RuleResult.Fail;
                             verboseWriter.LogSignatureMessage(signature, "Signature's accompanying URL is not a valid URI.");

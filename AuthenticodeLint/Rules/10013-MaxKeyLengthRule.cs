@@ -26,44 +26,30 @@ namespace AuthenticodeLint.Rules
                 var keyInfo = BitStrengthCalculator.CalculateStrength(signature.Certificate);
                 switch (keyInfo.AlgorithmName)
                 {
-                    case PublicKeyAlgorithm.ECDSA:
-                        if (keyInfo.BitSize == null)
-                        {
-                            verboseWriter.LogSignatureMessage(signature, "Signature uses ECDSA with an unknown curve.");
-                            result = RuleResult.Fail;
-                        }
-                        else if (keyInfo.BitSize > MAX_ECDSA_KEY_SIZE)
-                        {
-                            verboseWriter.LogSignatureMessage(signature, $"Signature uses ECDSA signature with a key size of {keyInfo.BitSize} exeeding maximum size of {MAX_ECDSA_KEY_SIZE}.");
-                            result = RuleResult.Fail;
-                        }
+                    case PublicKeyAlgorithm.ECDSA when keyInfo.BitSize is null:
+                        verboseWriter.LogSignatureMessage(signature, "Signature uses ECDSA with an unknown curve.");
+                        result = RuleResult.Fail;
                         break;
-                    case PublicKeyAlgorithm.RSA:
-                        if (keyInfo.BitSize == null)
-                        {
-                            verboseWriter.LogSignatureMessage(signature, "Signature has an unknown RSA key size.");
-                            result = RuleResult.Fail;
-                        }
-                        else if (keyInfo.BitSize > MAX_RSA_KEY_SIZE)
-                        {
-                            verboseWriter.LogSignatureMessage(signature, $"Signature uses RSA signature with a key size of {keyInfo.BitSize} exeeding maximum size of {MAX_RSA_KEY_SIZE}.");
-                            result = RuleResult.Fail;
-                        }
+                    case PublicKeyAlgorithm.ECDSA when keyInfo.BitSize > MAX_ECDSA_KEY_SIZE:
+                        verboseWriter.LogSignatureMessage(signature, $"Signature uses ECDSA signature with a key size of {keyInfo.BitSize} exeeding maximum size of {MAX_ECDSA_KEY_SIZE}.");
+                        result = RuleResult.Fail;
                         break;
-                    case PublicKeyAlgorithm.DSA:
-                        if (keyInfo.BitSize == null)
-                        {
-                            verboseWriter.LogSignatureMessage(signature, "Signature has an unknown DSA key size.");
-                            result = RuleResult.Fail;
-                        }
-                        else if (keyInfo.BitSize > MAX_DSA_KEY_SIZE)
-                        {
-                            verboseWriter.LogSignatureMessage(signature, $"Signature uses DSA signature with a key size of {keyInfo.BitSize} exeeding maximum size of {MAX_DSA_KEY_SIZE}.");
-                            result = RuleResult.Fail;
-                        }
+                    case PublicKeyAlgorithm.RSA when keyInfo.BitSize is null:
+                        verboseWriter.LogSignatureMessage(signature, "Signature has an unknown RSA key size.");
+                        result = RuleResult.Fail;
                         break;
-                    case PublicKeyAlgorithm.Other:
-                        goto default;
+                    case PublicKeyAlgorithm.RSA when keyInfo.BitSize > MAX_RSA_KEY_SIZE:
+                        verboseWriter.LogSignatureMessage(signature, $"Signature uses RSA signature with a key size of {keyInfo.BitSize} exeeding maximum size of {MAX_RSA_KEY_SIZE}.");
+                        result = RuleResult.Fail;
+                        break;
+                    case PublicKeyAlgorithm.DSA when keyInfo.BitSize is null:
+                        verboseWriter.LogSignatureMessage(signature, "Signature has an unknown DSA key size.");
+                        result = RuleResult.Fail;
+                        break;
+                    case PublicKeyAlgorithm.DSA when keyInfo.BitSize > MAX_DSA_KEY_SIZE:
+                        verboseWriter.LogSignatureMessage(signature, $"Signature uses DSA signature with a key size of {keyInfo.BitSize} exeeding maximum size of {MAX_DSA_KEY_SIZE}.");
+                        result = RuleResult.Fail;
+                        break;
                     default:
                         verboseWriter.LogSignatureMessage(signature, $"Signature uses an unknown algorithm.");
                         result = RuleResult.Fail;
