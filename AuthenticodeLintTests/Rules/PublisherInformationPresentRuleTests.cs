@@ -1,4 +1,5 @@
-﻿using AuthenticodeLint;
+﻿using AuthenticodeExaminer;
+using AuthenticodeLint;
 using AuthenticodeLint.Rules;
 using System.Collections.Generic;
 using Xunit;
@@ -9,11 +10,7 @@ namespace AuthenticodeLintTests.Rules
     {
         private static CheckConfiguration Configuration => new CheckConfiguration(new List<string>(), null, false, new HashSet<int>(), false, RevocationChecking.None, null, RuleSet.Modern);
 
-        private static IReadOnlyList<ISignature> GetGraphForFile(string file)
-        {
-            var extractor = new SignatureExtractor();
-            return extractor.Extract(file);
-        }
+        private static IReadOnlyList<ICmsSignature> GetGraphForFile(string file) => SignatureTreeInspector.Extract(file);
 
         [Fact]
         public void ShouldFailWhenNoPublisherInformation()

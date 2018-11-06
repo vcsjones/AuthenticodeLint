@@ -1,4 +1,5 @@
-﻿using AuthenticodeLint.Interop;
+﻿using AuthenticodeExaminer;
+using AuthenticodeLint.Interop;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
@@ -8,7 +9,7 @@ namespace AuthenticodeLint
 {
     public class Extraction
     {
-        public static void ExtractToDisk(string file, CheckConfiguration configuration, IReadOnlyList<ISignature> signatureGraph)
+        public static void ExtractToDisk(string file, CheckConfiguration configuration, IReadOnlyList<ICmsSignature> signatureGraph)
         {
             var fileDirectory = Path.Combine(configuration.ExtractPath, Path.GetFileName(file));
             if (Directory.Exists(fileDirectory))

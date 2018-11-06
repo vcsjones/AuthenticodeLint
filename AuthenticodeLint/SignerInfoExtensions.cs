@@ -1,12 +1,12 @@
-﻿using System.Security.Cryptography.Pkcs;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Cryptography;
+using AuthenticodeExaminer;
 
 namespace AuthenticodeLint
 {
     public static class SignerInfoExtensions
     {
-        public static byte[] SignatureDigest(this ISignature signature)
+        public static byte[] SignatureDigest(this ICmsSignature signature)
         {
             return signature.SignedAttributes
                 .Cast<CryptographicAttributeObject>()

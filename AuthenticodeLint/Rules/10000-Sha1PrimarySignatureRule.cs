@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using AuthenticodeExaminer;
 
 namespace AuthenticodeLint.Rules
 {
@@ -13,7 +13,7 @@ namespace AuthenticodeLint.Rules
 
         public RuleSet RuleSet { get; } = RuleSet.Compat;
 
-        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             if (graph.Count == 0)
             {

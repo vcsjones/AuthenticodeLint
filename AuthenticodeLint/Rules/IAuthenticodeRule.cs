@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using AuthenticodeExaminer;
+using System.Collections.Generic;
 
 namespace AuthenticodeLint.Rules
 {
@@ -12,7 +13,7 @@ namespace AuthenticodeLint.Rules
 
     public interface IAuthenticodeSignatureRule : IAuthenticodeRule
     {
-        RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration);
+        RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration);
     }
 
     public interface IAuthenticodeFileRule : IAuthenticodeRule

@@ -1,4 +1,5 @@
-﻿using AuthenticodeLint;
+﻿using AuthenticodeExaminer;
+using AuthenticodeLint;
 using AuthenticodeLint.Rules;
 using System;
 using System.Collections.Generic;

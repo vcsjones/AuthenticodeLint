@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AuthenticodeExaminer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -152,7 +153,6 @@ namespace AuthenticodeLint
             {
                 return ExitCodes.InvalidInputOrConfig;
             }
-            var extractor = new SignatureExtractor();
             var collectors = new List<IRuleResultCollector>();
             if (!quiet)
             {
@@ -165,7 +165,7 @@ namespace AuthenticodeLint
             var result = ExitCodes.Success;
             foreach (var file in inputs)
             {
-                var signatures = extractor.Extract(file);
+                var signatures = SignatureTreeInspector.Extract(file);
                 if (CheckEngine.Instance.RunAllRules(file, signatures, collectors, configuration) != RuleEngineResult.AllPass)
                 {
                     result = ExitCodes.ChecksFailed;
@@ -210,12 +210,5 @@ Exit codes:
         public static int InvalidInputOrConfig { get; } = 1;
         public static int ChecksFailed { get; } = 2;
         public static int UnknownResults { get; } = 0xFF;
-    }
-
-    public enum RevocationChecking
-    {
-        None,
-        Offline,
-        Online
     }
 }

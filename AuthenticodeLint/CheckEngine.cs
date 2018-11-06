@@ -2,6 +2,7 @@
 using AuthenticodeLint.Rules;
 using System;
 using System.Linq;
+using AuthenticodeExaminer;
 
 namespace AuthenticodeLint
 {
@@ -24,7 +25,7 @@ namespace AuthenticodeLint
                     ).ToList();
         }
 
-        public RuleEngineResult RunAllRules(string file, IReadOnlyList<ISignature> signatures, List<IRuleResultCollector> collectors, CheckConfiguration configuration)
+        public RuleEngineResult RunAllRules(string file, IReadOnlyList<ICmsSignature> signatures, List<IRuleResultCollector> collectors, CheckConfiguration configuration)
         {
             var verbose = configuration.Verbose;
             var suppressedRuleIDs = configuration.SuppressErrorIDs;

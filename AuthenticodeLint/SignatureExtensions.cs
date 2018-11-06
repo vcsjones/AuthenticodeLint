@@ -1,26 +1,25 @@
-﻿using System;
+﻿using AuthenticodeExaminer;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace AuthenticodeLint
 {
     public static class SignatureExtensions
     {
-        public static IEnumerable<ISignature> VisitAll(this ISignature signature, SignatureKind kind)
+        public static IEnumerable<ICmsSignature> VisitAll(this ICmsSignature signature, SignatureKind kind, bool deep = false)
         {
             foreach (var nested in signature.GetNestedSignatures())
             {
                 if ((nested.Kind & kind) > 0)
                 {
                     yield return nested;
-                    foreach(var nestVisit in nested.VisitAll(kind))
+                    foreach (var nestVisit in nested.VisitAll(kind, deep))
                     {
                         yield return nestVisit;
                     }
                 }
-                else if ((kind & SignatureKind.Deep) == SignatureKind.Deep)
+                else if (deep)
                 {
-                    foreach (var nestVisit in nested.VisitAll(kind))
+                    foreach (var nestVisit in nested.VisitAll(kind, deep))
                     {
                         yield return nestVisit;
                     }
@@ -28,7 +27,7 @@ namespace AuthenticodeLint
             }
         }
 
-        public static IEnumerable<ISignature> VisitAll(this IReadOnlyList<ISignature> signatures, SignatureKind kind)
+        public static IEnumerable<ICmsSignature> VisitAll(this IReadOnlyList<ICmsSignature> signatures, SignatureKind kind, bool deep = false)
         {
             foreach (var signature in signatures)
             {
@@ -36,25 +35,11 @@ namespace AuthenticodeLint
                 {
                     yield return signature;
                 }
-                foreach (var nested in VisitAll(signature, kind))
+                foreach (var nested in VisitAll(signature, kind, deep))
                 {
                     yield return nested;
                 }
             }
         }
-    }
-
-
-    [Flags]
-    public enum SignatureKind
-    {
-        NestedSignature = 0x1,
-        Signature = 0x2,
-        AuthenticodeTimestamp = 0x4,
-        Rfc3161Timestamp = 0x8,
-        AnySignature = NestedSignature | Signature,
-        AnyCounterSignature = AuthenticodeTimestamp | Rfc3161Timestamp,
-        Any = AnySignature | AnyCounterSignature,
-        Deep = 0x1000
     }
 }

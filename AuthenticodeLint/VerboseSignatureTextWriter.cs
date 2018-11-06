@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AuthenticodeExaminer;
 
 namespace AuthenticodeLint
 {
@@ -6,7 +7,7 @@ namespace AuthenticodeLint
     {
         public override void LogMessage(string message) => Messages.Add(message);
 
-        public override void LogSignatureMessage(ISignature signature, string message)
+        public override void LogSignatureMessage(ICmsSignature signature, string message)
         {
             var digestString = HashHelpers.GetHashForSignature(signature);
             Messages.Add($"Signature {digestString}: {message}");
@@ -19,7 +20,7 @@ namespace AuthenticodeLint
         {
         }
 
-        public override void LogSignatureMessage(ISignature signature, string message)
+        public override void LogSignatureMessage(ICmsSignature signature, string message)
         {
         }
     }
@@ -30,7 +31,7 @@ namespace AuthenticodeLint
 
         public List<string> Messages { get; } = new List<string>();
 
-        public abstract void LogSignatureMessage(ISignature signature, string message);
+        public abstract void LogSignatureMessage(ICmsSignature signature, string message);
         public abstract void LogMessage(string message);
     }
 }

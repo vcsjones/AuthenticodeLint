@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using AuthenticodeExaminer;
 
 namespace AuthenticodeLint.Rules
 {
@@ -10,11 +11,11 @@ namespace AuthenticodeLint.Rules
         public abstract string ShortDescription { get; }
         public abstract RuleSet RuleSet { get; }
 
-        protected abstract bool ValidateChain(ISignature signer, X509Chain chain, SignatureLogger verboseWriter);
+        protected abstract bool ValidateChain(ICmsSignature signer, X509Chain chain, SignatureLogger verboseWriter);
 
-        public RuleResult Validate(IReadOnlyList<ISignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
+        public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var signatures = graph.VisitAll(SignatureKind.AnySignature | SignatureKind.Deep);
+            var signatures = graph.VisitAll(SignatureKind.AnySignature, deep: true);
             var result = RuleResult.Pass;
             foreach (var signature in signatures)
             {

@@ -10,6 +10,9 @@
     <Copyright>Kevin Jones 2016-2017</Copyright>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AuthenticodeExaminer" Version="0.3.0" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System.Security" />
   </ItemGroup>
 </Project>
