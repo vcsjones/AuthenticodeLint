@@ -21,7 +21,7 @@ namespace AuthenticodeLintTests.Rules
 
             var result = rule.Validate(signature, logger, Configuration);
             Assert.Equal(RuleResult.Fail, result);
-            Assert.Collection(logger.Messages, s => s.EndsWith("Signature does not have an accompanying description."), s => s.EndsWith("Signature does not have an accompanying URL."));
+            Assert.Collection(logger.Messages, s => s.EndsWith("Signature does not have any publisher information."));
         }
 
         [Fact]
