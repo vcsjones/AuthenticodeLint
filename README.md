@@ -24,6 +24,12 @@ Rules can be suppressed with the `-suppress` option:
 
 More information and options are available using `-help`.
 
+# Installation
+
+This tool requires .NET Core 2.1 and can be installed as a .NET CLI global tool.
+
+    dotnet tool install -g AuthenticodeLint
+
 # Documentation
 
 Documentation for usage and for each rule is documented [on the wiki](https://github.com/vcsjones/AuthenticodeLint/wiki).
@@ -32,6 +38,4 @@ Documentation for usage and for each rule is documented [on the wiki](https://gi
 
 The purpose of this tool is not to validate that everything uses the strongest signature algorithms
 and certificates possible. Rather, this tool aims to make sure that the signatures provide proper
-security while maintaining compatibility with as many enviroments as possible. For example, this tool
-validates that the binary is has [dual signatures](https://textslashplain.com/2016/01/10/authenticode-in-2016/)
-for broader compatility than using SHA256 alone.
+security while maintaining compatibility with as many environments as possible.
