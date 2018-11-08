@@ -7,13 +7,13 @@ namespace AuthenticodeLint.Rules
 {
     public class NoUnknownCertificatesRule : IAuthenticodeSignatureRule
     {
-        public int RuleId { get; } = 10010;
+        public int RuleId => 10010;
 
-        public string RuleName { get; } = "No Unknown Certificates";
+        public string RuleName => "No Unknown Certificates";
 
-        public string ShortDescription { get; } = "Checks for unknown embedded certificates.";
+        public string ShortDescription => "Checks for unknown embedded certificates.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet => RuleSet.All;
 
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {

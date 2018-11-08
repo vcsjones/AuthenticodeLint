@@ -5,13 +5,13 @@ namespace AuthenticodeLint.Rules
 {
     public class SigningCertificateDigestAlgorithmRule : CertificateChainRuleBase
     {
-        public override int RuleId { get; } = 10006;
+        public override int RuleId => 10006;
 
-        public override string RuleName { get; } = "Strong Certificate Chain";
+        public override string RuleName => "Strong Certificate Chain";
 
-        public override string ShortDescription { get; } = "Checks the signing certificate's and chain's signature algorithm.";
+        public override string ShortDescription => "Checks the signing certificate's and chain's signature algorithm.";
 
-        public override RuleSet RuleSet { get; } = RuleSet.All;
+        public override RuleSet RuleSet => RuleSet.All;
         
         protected override bool ValidateChain(ICmsSignature signer, X509Chain chain, SignatureLogger verboseWriter)
         {

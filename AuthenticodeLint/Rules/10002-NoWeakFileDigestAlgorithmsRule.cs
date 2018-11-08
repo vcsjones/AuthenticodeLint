@@ -5,13 +5,13 @@ namespace AuthenticodeLint.Rules
 {
     public class NoWeakFileDigestAlgorithmsRule : IAuthenticodeSignatureRule
     {
-        public int RuleId { get; } = 10002;
+        public int RuleId => 10002;
 
-        public string RuleName { get; } = "No Weak File Digests";
+        public string RuleName => "No Weak File Digests";
 
-        public string ShortDescription { get; } = "Checks for weak file digest algorithms.";
+        public string ShortDescription => "Checks for weak file digest algorithms.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet => RuleSet.All;
         
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {

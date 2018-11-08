@@ -6,17 +6,17 @@ namespace AuthenticodeLint.Rules
 {
     public class RsaDsaPrimarySignatureRule : IAuthenticodeSignatureRule
     {
-        public int RuleId { get; } = 10012;
+        public int RuleId => 10012;
 
-        public string RuleName { get; } = "RSA/DSA Primary Signature";
+        public string RuleName => "RSA/DSA Primary Signature";
 
-        public string ShortDescription { get; } = "Primary signature should be RSA or DSA.";
+        public string ShortDescription => "Primary signature should be RSA or DSA.";
 
-        public RuleSet RuleSet { get; } = RuleSet.Compat;
+        public RuleSet RuleSet => RuleSet.Compat;
 
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
-            var primary = graph.SingleOrDefault();
+            var primary = graph.FirstOrDefault();
             //There are zero signatures.
             if (primary == null)
             {

@@ -6,13 +6,13 @@ namespace AuthenticodeLint.Rules
 {
     public class PublisherInformationUrlHttpsRule : IAuthenticodeSignatureRule
     {
-        public int RuleId { get; } = 10005;
+        public int RuleId => 10005;
 
-        public string RuleName { get; } = "Publisher Information URL HTTPS Rule";
+        public string RuleName => "Publisher Information URL HTTPS Rule";
 
-        public string ShortDescription { get; } = "Checks that the signature uses HTTPS for the publisher's URL.";
+        public string ShortDescription => "Checks that the signature uses HTTPS for the publisher's URL.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet => RuleSet.All;
 
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {

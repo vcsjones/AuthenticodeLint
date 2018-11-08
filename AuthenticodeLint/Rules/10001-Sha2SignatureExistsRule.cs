@@ -6,13 +6,13 @@ namespace AuthenticodeLint.Rules
 {
     public class Sha2SignatureExistsRule : IAuthenticodeSignatureRule
     {
-        public int RuleId { get; } = 10001;
+        public int RuleId => 10001;
 
-        public string RuleName { get; } = "SHA2 Signed";
+        public string RuleName => "SHA2 Signed";
 
-        public string ShortDescription { get; } = "A SHA2 signature should exist.";
+        public string ShortDescription => "A SHA2 signature should exist.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet => RuleSet.All;
 
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {

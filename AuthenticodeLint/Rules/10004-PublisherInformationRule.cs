@@ -6,13 +6,13 @@ namespace AuthenticodeLint.Rules
 {
     public class PublisherInformationPresentRule : IAuthenticodeSignatureRule
     {
-        public int RuleId { get; } = 10004;
+        public int RuleId => 10004;
 
-        public string RuleName { get; } = "Publisher Information Present";
+        public string RuleName => "Publisher Information Present";
 
-        public string ShortDescription { get; } = "Checks that the signature provided publisher information.";
+        public string ShortDescription => "Checks that the signature provided publisher information.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet => RuleSet.All;
         
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {

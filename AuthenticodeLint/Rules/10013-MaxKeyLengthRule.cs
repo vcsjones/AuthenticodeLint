@@ -9,13 +9,13 @@ namespace AuthenticodeLint.Rules
         private const int MAX_RSA_KEY_SIZE = 4096;
         private const int MAX_DSA_KEY_SIZE = 1024;
 
-        public int RuleId { get; } = 10013;
+        public int RuleId => 10013;
 
-        public string RuleName { get; } = "Maximum Key Length";
+        public string RuleName => "Maximum Key Length";
 
-        public string ShortDescription { get; } = "Validates the maximum key length of a signing certificate.";
+        public string ShortDescription => "Validates the maximum key length of a signing certificate.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet => RuleSet.All;
 
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {

@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Linq;
+using System.Numerics;
 
 namespace AuthenticodeLint.Rules
 {
     public class WinCertificatePaddingRule : IAuthenticodeFileRule
     {
-        public int RuleId { get; } = 10008;
+        public int RuleId => 10008;
 
-        public string RuleName { get; } = "No WinCertificate Structure Padding";
+        public string RuleName => "No WinCertificate Structure Padding";
 
-        public string ShortDescription { get; } = "Checks for non-zero data after the signature.";
+        public string ShortDescription => "Checks for non-zero data after the signature.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet => RuleSet.All;
 
         public RuleResult Validate(string file, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {

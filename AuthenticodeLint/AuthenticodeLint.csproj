@@ -3,10 +3,19 @@
     <OutputType>WinExe</OutputType>
     <AssemblyName>authlint</AssemblyName>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <VersionPrefix>0.11.0</VersionPrefix>
+    <VersionPrefix>0.12.0</VersionPrefix>
     <Authors>Kevin Jones</Authors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Copyright>Kevin Jones 2016-2017</Copyright>
+    <Copyright>Kevin Jones 2016-2018</Copyright>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>authlint</ToolCommandName>
+    <Description>Authenticode Lint is a Windows command-line tool for linting an examining an Authenticode signed file.</Description>
+    <Authors>Kevin Jones</Authors>
+    <PackageTags>authenticode</PackageTags>
+    <PackageProjectUrl>https://github.com/vcsjones/AuthenticodeLint</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/vcsjones/AuthenticodeLint</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AuthenticodeExaminer" Version="0.3.0" />

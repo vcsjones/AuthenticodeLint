@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace AuthenticodeLint
 {
@@ -10,6 +11,11 @@ namespace AuthenticodeLint
     {
         static int Main(string[] args)
         {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Console.Error.WriteLine("AuthenticodeLint is only supported on Windows.");
+                return ExitCodes.PlatformNotSupported;
+            }
             var cli = Environment.CommandLine;
             List<CommandLineParameter> parsedCommandLine;
             try
@@ -206,9 +212,10 @@ Exit codes:
 
     internal static class ExitCodes
     {
-        public static int Success { get; } = 0;
-        public static int InvalidInputOrConfig { get; } = 1;
-        public static int ChecksFailed { get; } = 2;
-        public static int UnknownResults { get; } = 0xFF;
+        public static int Success => 0;
+        public static int InvalidInputOrConfig => 1;
+        public static int ChecksFailed => 2;
+        public static int UnknownResults => 0xFF;
+        public static int PlatformNotSupported => unchecked((int)0x80131539);
     }
 }

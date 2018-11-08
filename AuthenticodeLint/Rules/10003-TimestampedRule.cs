@@ -7,13 +7,13 @@ namespace AuthenticodeLint.Rules
 {
     public class TimestampedRule : IAuthenticodeSignatureRule
     {
-        public int RuleId { get; } = 10003;
+        public int RuleId => 10003;
 
-        public string RuleName { get; } = "Timestamped Rule";
+        public string RuleName => "Timestamped Rule";
 
-        public string ShortDescription { get; } = "Signatures should have a timestamp counter signer.";
+        public string ShortDescription => "Signatures should have a timestamp counter signer.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet => RuleSet.All;
 
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {

@@ -9,13 +9,13 @@ namespace AuthenticodeLint.Rules
         private const int MIN_RSADSA_KEY_SIZE = 2048;
         private const int MIN_ECDSA_KEY_SIZE = 256;
 
-        public int RuleId { get; } = 10011;
+        public int RuleId => 10011;
 
-        public string RuleName { get; } = "Strong Key Length";
+        public string RuleName => "Strong Key Length";
 
-        public string ShortDescription { get; } = "Validates the key length of a signing certificate.";
+        public string ShortDescription => "Validates the key length of a signing certificate.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet => RuleSet.All;
 
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {

@@ -6,13 +6,13 @@ namespace AuthenticodeLint.Rules
 {
     public class NoUnknownUnsignedAttibuteRule : IAuthenticodeSignatureRule
     {
-        public int RuleId { get; } = 10009;
+        public int RuleId => 10009;
 
-        public string RuleName { get; } = "No Unknown Unsigned Attributes";
+        public string RuleName => "No Unknown Unsigned Attributes";
 
-        public string ShortDescription { get; } = "Checks for the presence of unsigned attributes with unknown an OID.";
+        public string ShortDescription => "Checks for the presence of unsigned attributes with unknown an OID.";
 
-        public RuleSet RuleSet { get; } = RuleSet.All;
+        public RuleSet RuleSet => RuleSet.All;
 
         private static string[] _trustedUnsignedAttributes = new[]
         {
