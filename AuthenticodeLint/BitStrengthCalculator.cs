@@ -6,7 +6,7 @@ namespace AuthenticodeLint
 {
     public static class BitStrengthCalculator
     {
-        private static ConcurrentDictionary<string, int> _cachedEccCurveSizes = new ConcurrentDictionary<string, int>();
+        private static readonly ConcurrentDictionary<string, int> _cachedEccCurveSizes = new ConcurrentDictionary<string, int>();
 
         public static CertificateBitStrength CalculateStrength(X509Certificate2 certificate)
         {
@@ -16,19 +16,30 @@ namespace AuthenticodeLint
             {
                 case KnownOids.X509Algorithms.Ecc:
                     keyAlgorithm = PublicKeyAlgorithm.ECDSA;
-                    var parameterOid = OidParser.ReadFromBytes(certificate.PublicKey.EncodedParameters.RawData);
-                    bitSize = _cachedEccCurveSizes.GetOrAdd(parameterOid.Value, oid =>
+                    string? parameterOid = OidParser.ReadFromBytes(certificate.PublicKey.EncodedParameters.RawData);
+
+                    if (parameterOid is null)
                     {
-                        var curve = ECCurve.CreateFromValue(oid);
-                        using (var ecdsa = ECDsa.Create(curve))
+                        bitSize = null;
+                    }
+                    else
+                    {
+                        bitSize = _cachedEccCurveSizes.GetOrAdd(parameterOid, static oid =>
                         {
-                            return ecdsa.KeySize;
-                        }
-                    });
+                            var curve = ECCurve.CreateFromValue(oid);
+                            using (var ecdsa = ECDsa.Create(curve))
+                            {
+                                return ecdsa.KeySize;
+                            }
+                        });
+                    }
                     break;
                 case KnownOids.X509Algorithms.RSA:
                     keyAlgorithm = PublicKeyAlgorithm.RSA;
-                    bitSize = certificate.PublicKey.Key.KeySize;
+                    using (RSA? rsa = certificate.GetRSAPublicKey())
+                    {
+                        bitSize = rsa?.KeySize;
+                    }
                     break;
                 default:
                     keyAlgorithm = PublicKeyAlgorithm.Other;

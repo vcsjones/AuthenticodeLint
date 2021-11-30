@@ -8,15 +8,15 @@ namespace AuthenticodeLint
     public class CheckConfiguration
     {
         public IReadOnlyList<string> InputPaths { get; }
-        public string ReportPath { get; }
+        public string? ReportPath { get; }
         public bool Quiet { get; }
         public HashSet<int> SuppressErrorIDs { get; }
         public bool Verbose { get; }
         public RevocationChecking RevocationMode {get;}
-        public string ExtractPath { get; }
+        public string? ExtractPath { get; }
         public RuleSet RuleSet { get; }
 
-        public CheckConfiguration(IReadOnlyList<string> inputPaths, string reportPath, bool quiet, HashSet<int> suppressErrorIDs, bool verbose, RevocationChecking revocationMode, string extract, RuleSet ruleSet)
+        public CheckConfiguration(IReadOnlyList<string> inputPaths, string? reportPath, bool quiet, HashSet<int> suppressErrorIDs, bool verbose, RevocationChecking revocationMode, string? extract, RuleSet ruleSet)
         {
             InputPaths = inputPaths;
             ReportPath = reportPath;

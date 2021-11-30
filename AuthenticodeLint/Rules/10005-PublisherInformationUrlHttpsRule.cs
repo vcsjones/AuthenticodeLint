@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Rules
             var result = RuleResult.Pass;
             foreach(var signature in signatures)
             {
-                PublisherInformation info = null;
+                PublisherInformation? info = null;
                 foreach(var attribute in signature.SignedAttributes)
                 {
                     if (attribute.Oid.Value == KnownOids.OpusInfo)

@@ -17,7 +17,7 @@ namespace AuthenticodeLint
                 return ExitCodes.PlatformNotSupported;
             }
             var cli = Environment.CommandLine;
-            List<CommandLineParameter> parsedCommandLine;
+            List<CommandLineParameter>? parsedCommandLine;
             try
             {
                 var commandLine = CommandLineParser.LexCommandLine(cli).Skip(1);
@@ -39,8 +39,8 @@ namespace AuthenticodeLint
             var suppress = new HashSet<int>();
             bool quiet = false;
             bool verbose = false;
-            string report = null;
-            string extract = null;
+            string? report = null;
+            string? extract = null;
             var revocation = RevocationChecking.None;
             var ruleSet = RuleSet.Modern;
             foreach(var parameter in parsedCommandLine)
@@ -54,7 +54,7 @@ namespace AuthenticodeLint
                     }
                     var filePattern = Path.GetFileName(parameter.Value);
                     //The value contains a pattern.
-                    if (filePattern.Contains("*") || filePattern.Contains("?"))
+                    if (filePattern.Contains('*') || filePattern.Contains('?'))
                     {
                         var directory = Path.GetDirectoryName(parameter.Value);
                         if (Directory.Exists(directory))

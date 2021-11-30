@@ -7,7 +7,7 @@ namespace AuthenticodeLint
 {
     public static class CertificatePaddingExtractor
     {
-        public static byte[] ExtractPadding(string filePath)
+        public static byte[]? ExtractPadding(string filePath)
         {
             using (var file = new PortableExecutable(filePath))
             {
