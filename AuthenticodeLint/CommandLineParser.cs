@@ -7,16 +7,17 @@ namespace AuthenticodeLint
 
     public readonly struct CommandLineParameter
     {
-        private readonly string _name, _value;
+        private readonly string _name;
+        private readonly string? _value;
 
-        public CommandLineParameter(string name, string value)
+        public CommandLineParameter(string name, string? value)
         {
             _name = name;
             _value = value;
         }
 
         public string Name => _name;
-        public string Value => _value;
+        public string? Value => _value;
     }
 
 
@@ -24,7 +25,7 @@ namespace AuthenticodeLint
     {
         public static IEnumerable<CommandLineParameter> CreateCommandLineParametersWithValues(IEnumerable<string> input)
         {
-            string parameterName = null;
+            string? parameterName = null;
             foreach (var token in input)
             {
                 if (string.IsNullOrWhiteSpace(token) || token.Length == 0)

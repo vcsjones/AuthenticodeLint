@@ -12,7 +12,7 @@ namespace AuthenticodeLint.Rules
         public override string ShortDescription => "Checks the signing certificate's and chain's signature algorithm.";
 
         public override RuleSet RuleSet => RuleSet.All;
-        
+
         protected override bool ValidateChain(ICmsSignature signer, X509Chain chain, SignatureLogger verboseWriter)
         {
             return ValidateStrongChain(signer, chain, verboseWriter);
@@ -20,16 +20,16 @@ namespace AuthenticodeLint.Rules
 
         private static bool ValidateStrongChain(ICmsSignature signature, X509Chain chain, SignatureLogger verboseWriter)
         {
-            var signatureStrength = GetHashStrenghForComparison(signature.DigestAlgorithm.Value);
+            var signatureStrength = GetHashStrenghForComparison(signature.DigestAlgorithm.Value!);
             var strongShaChain = true;
             var leafCertificateSignatureAlgorithm = chain.ChainElements[0].Certificate.SignatureAlgorithm;
-            var leafCertificateSignatureAlgorithmStrength = GetHashStrenghForComparison(leafCertificateSignatureAlgorithm.Value);
+            var leafCertificateSignatureAlgorithmStrength = GetHashStrenghForComparison(leafCertificateSignatureAlgorithm.Value!);
             //We use count-1 because we don't want to validate the root certificate.
             for (var i = 0; i < chain.ChainElements.Count - 1; i++)
             {
                 var element = chain.ChainElements[i];
                 var signatureAlgorithm = element.Certificate.SignatureAlgorithm;
-                var certificateHashStrength = GetHashStrenghForComparison(signatureAlgorithm.Value);
+                var certificateHashStrength = GetHashStrenghForComparison(signatureAlgorithm.Value!);
                 if (certificateHashStrength < signatureStrength)
                 {
                     verboseWriter.LogSignatureMessage(signature, $"Certificate {element.Certificate.Thumbprint} in chain uses {element.Certificate.SignatureAlgorithm.FriendlyName} for its signature algorithm instead of at least {signature.DigestAlgorithm.FriendlyName}.");
@@ -48,33 +48,17 @@ namespace AuthenticodeLint.Rules
         //angainst other values.
         private static int GetHashStrenghForComparison(string oid)
         {
-            switch (oid)
+            return oid switch
             {
-                case KnownOids.MD2:
-                    return 2;
-                case KnownOids.MD4:
-                    return 4;
-                case KnownOids.MD5:
-                    return 5;
-                case KnownOids.SHA1:
-                case KnownOids.sha1ECDSA:
-                case KnownOids.sha1RSA:
-                    return 10;
-                case KnownOids.SHA256:
-                case KnownOids.sha256ECDSA:
-                case KnownOids.sha256RSA:
-                    return 256;
-                case KnownOids.SHA384:
-                case KnownOids.sha384ECDSA:
-                case KnownOids.sha384RSA:
-                    return 384;
-                case KnownOids.SHA512:
-                case KnownOids.sha512ECDSA:
-                case KnownOids.sha512RSA:
-                    return 512;
-                default:
-                    return 0;
-            }
+                KnownOids.MD2 => 2,
+                KnownOids.MD4 => 4,
+                KnownOids.MD5 => 5,
+                KnownOids.SHA1 or KnownOids.sha1ECDSA or KnownOids.sha1RSA => 10,
+                KnownOids.SHA256 or KnownOids.sha256ECDSA or KnownOids.sha256RSA => 256,
+                KnownOids.SHA384 or KnownOids.sha384ECDSA or KnownOids.sha384RSA => 384,
+                KnownOids.SHA512 or KnownOids.sha512ECDSA or KnownOids.sha512RSA => 512,
+                _ => 0,
+            };
         }
     }
 }

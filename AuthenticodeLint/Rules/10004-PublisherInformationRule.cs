@@ -13,14 +13,14 @@ namespace AuthenticodeLint.Rules
         public string ShortDescription => "Checks that the signature provided publisher information.";
 
         public RuleSet RuleSet => RuleSet.All;
-        
+
         public RuleResult Validate(IReadOnlyList<ICmsSignature> graph, SignatureLogger verboseWriter, CheckConfiguration configuration)
         {
             var signatures = graph.VisitAll(SignatureKind.AnySignature, deep: true);
             var result = RuleResult.Pass;
             foreach (var signature in signatures)
             {
-                PublisherInformation info = null;
+                PublisherInformation? info = null;
                 foreach (var attribute in signature.SignedAttributes)
                 {
                     if (attribute.Oid.Value == KnownOids.OpusInfo)

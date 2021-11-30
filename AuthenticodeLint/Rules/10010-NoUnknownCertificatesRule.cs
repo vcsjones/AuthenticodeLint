@@ -61,8 +61,17 @@ namespace AuthenticodeLint.Rules
 
         private class CertificateThumbprintComparer : IEqualityComparer<X509Certificate2>
         {
-            public bool Equals(X509Certificate2 x, X509Certificate2 y)
+            public bool Equals(X509Certificate2? x, X509Certificate2? y)
             {
+                if (x is null && y is null)
+                {
+                    return true;
+                }
+                if (x is null || y is null)
+                {
+                    return false;
+                }
+
                 return x.Thumbprint == y.Thumbprint;
             }
 

@@ -6,7 +6,7 @@ namespace AuthenticodeLint
 {
     public class StdOutRuleResultCollector : IRuleResultCollector
     {
-        private string _setName;
+        private string? _setName;
 
         public void BeginSet(string setName)
         {

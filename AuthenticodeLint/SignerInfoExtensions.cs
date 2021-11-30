@@ -6,7 +6,7 @@ namespace AuthenticodeLint
 {
     public static class SignerInfoExtensions
     {
-        public static byte[] SignatureDigest(this ICmsSignature signature)
+        public static byte[]? SignatureDigest(this ICmsSignature signature)
         {
             return signature.SignedAttributes
                 .Cast<CryptographicAttributeObject>()

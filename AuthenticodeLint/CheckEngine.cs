@@ -19,7 +19,7 @@ namespace AuthenticodeLint
         {
             return (from type in typeof(IAuthenticodeRule).Assembly.GetExportedTypes()
                     where typeof(IAuthenticodeRule).IsAssignableFrom(type) && type.GetConstructor(Type.EmptyTypes) != null
-                    let instance = (IAuthenticodeRule)Activator.CreateInstance(type)
+                    let instance = (IAuthenticodeRule)Activator.CreateInstance(type)! // We know this should not be null.
                     orderby instance.RuleId
                     select instance
                     ).ToList();
@@ -53,17 +53,12 @@ namespace AuthenticodeLint
                     }
                     else
                     {
-                        switch (rule)
+                        result = rule switch
                         {
-                            case IAuthenticodeFileRule fileRule:
-                                result = fileRule.Validate(file, verboseWriter, configuration);
-                                break;
-                            case IAuthenticodeSignatureRule sigRule:
-                                result = sigRule.Validate(signatures, verboseWriter, configuration);
-                                break;
-                            default:
-                                throw new NotSupportedException("Rule type is not supported.");
-                        }
+                            IAuthenticodeFileRule fileRule => fileRule.Validate(file, verboseWriter, configuration),
+                            IAuthenticodeSignatureRule sigRule => sigRule.Validate(signatures, verboseWriter, configuration),
+                            _ => throw new NotSupportedException("Rule type is not supported."),
+                        };
                     }
                 }
                 if (result == RuleResult.Fail)
