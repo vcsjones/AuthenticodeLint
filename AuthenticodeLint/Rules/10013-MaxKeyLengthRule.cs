@@ -23,7 +23,7 @@ namespace AuthenticodeLint.Rules
             var result = RuleResult.Pass;
             foreach (var signature in signatures)
             {
-                var keyInfo = BitStrengthCalculator.CalculateStrength(signature.Certificate);
+                var keyInfo = BitStrengthCalculator.CalculateStrength(signature.Certificate!);
                 switch (keyInfo.AlgorithmName)
                 {
                     case PublicKeyAlgorithm.ECDSA when keyInfo.BitSize is null:

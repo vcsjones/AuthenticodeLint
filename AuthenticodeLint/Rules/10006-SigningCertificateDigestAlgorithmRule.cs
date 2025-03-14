@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Rules
 
         private static bool ValidateStrongChain(ICmsSignature signature, X509Chain chain, SignatureLogger verboseWriter)
         {
-            var signatureStrength = GetHashStrenghForComparison(signature.DigestAlgorithm.Value!);
+            var signatureStrength = GetHashStrenghForComparison(signature.DigestAlgorithm!.Value!);
             var strongShaChain = true;
             var leafCertificateSignatureAlgorithm = chain.ChainElements[0].Certificate.SignatureAlgorithm;
             var leafCertificateSignatureAlgorithmStrength = GetHashStrenghForComparison(leafCertificateSignatureAlgorithm.Value!);

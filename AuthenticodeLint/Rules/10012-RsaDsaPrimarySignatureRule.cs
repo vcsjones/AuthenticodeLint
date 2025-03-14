@@ -22,7 +22,7 @@ namespace AuthenticodeLint.Rules
             {
                 return RuleResult.Fail;
             }
-            var info = BitStrengthCalculator.CalculateStrength(primary.Certificate);
+            var info = BitStrengthCalculator.CalculateStrength(primary.Certificate!);
             if (info.AlgorithmName != PublicKeyAlgorithm.RSA && info.AlgorithmName != PublicKeyAlgorithm.DSA)
             {
                 verboseWriter.LogSignatureMessage(primary, $"Primary signature should use RSA or DSA key but uses {info.AlgorithmName.ToString()}");

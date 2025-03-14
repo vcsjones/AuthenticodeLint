@@ -19,7 +19,7 @@ namespace AuthenticodeLint.Rules
             var result = RuleResult.Pass;
             foreach(var signature in signatures)
             {
-                if (signature.DigestAlgorithm.Value == KnownOids.MD2)
+                if (signature.DigestAlgorithm!.Value == KnownOids.MD2)
                 {
                     verboseWriter.LogSignatureMessage(signature, $"Uses the {nameof(KnownOids.MD2)} digest algorithm.");
                     result = RuleResult.Fail;

@@ -11,174 +11,182 @@ namespace AuthenticodeLint
     {
         static int Main(string[] args)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                Console.Error.WriteLine("AuthenticodeLint is only supported on Windows.");
-                return ExitCodes.PlatformNotSupported;
-            }
-            var cli = Environment.CommandLine;
-            List<CommandLineParameter>? parsedCommandLine;
             try
             {
-                var commandLine = CommandLineParser.LexCommandLine(cli).Skip(1);
-                parsedCommandLine = CommandLineParser.CreateCommandLineParametersWithValues(commandLine).ToList();
-            }
-            catch(InvalidOperationException)
-            {
-                parsedCommandLine = null;
-            }
-
-            if (parsedCommandLine == null || parsedCommandLine.Count == 0 || parsedCommandLine.Any(cl => cl.Name == "help"))
-            {
-                ShowHelp();
-                //Avoid returning success for printing help so that automated build systems do not interpret "show the help"
-                //As a successful build incase the build system is incorrectly passing arguments.
-                return ExitCodes.InvalidInputOrConfig;
-            }
-            var inputs = new List<string>();
-            var suppress = new HashSet<int>();
-            bool quiet = false;
-            bool verbose = false;
-            string? report = null;
-            string? extract = null;
-            var revocation = RevocationChecking.None;
-            var ruleSet = RuleSet.Modern;
-            foreach(var parameter in parsedCommandLine)
-            {
-                if (parameter.Name == "in")
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    if (string.IsNullOrWhiteSpace(parameter.Value))
+                    Console.Error.WriteLine("AuthenticodeLint is only supported on Windows.");
+                    return ExitCodes.PlatformNotSupported;
+                }
+                var cli = Environment.CommandLine;
+                List<CommandLineParameter>? parsedCommandLine;
+                try
+                {
+                    var commandLine = CommandLineParser.LexCommandLine(cli).Skip(1);
+                    parsedCommandLine = CommandLineParser.CreateCommandLineParametersWithValues(commandLine).ToList();
+                }
+                catch (InvalidOperationException)
+                {
+                    parsedCommandLine = null;
+                }
+
+                if (parsedCommandLine == null || parsedCommandLine.Count == 0 || parsedCommandLine.Any(cl => cl.Name == "help"))
+                {
+                    ShowHelp();
+                    //Avoid returning success for printing help so that automated build systems do not interpret "show the help"
+                    //As a successful build incase the build system is incorrectly passing arguments.
+                    return ExitCodes.InvalidInputOrConfig;
+                }
+                var inputs = new List<string>();
+                var suppress = new HashSet<int>();
+                bool quiet = false;
+                bool verbose = false;
+                string? report = null;
+                string? extract = null;
+                var revocation = RevocationChecking.None;
+                var ruleSet = RuleSet.Modern;
+                foreach (var parameter in parsedCommandLine)
+                {
+                    if (parameter.Name == "in")
                     {
-                        Console.Error.WriteLine("A value is required for input.");
-                        return ExitCodes.InvalidInputOrConfig;
-                    }
-                    var filePattern = Path.GetFileName(parameter.Value);
-                    //The value contains a pattern.
-                    if (filePattern.Contains('*') || filePattern.Contains('?'))
-                    {
-                        var directory = Path.GetDirectoryName(parameter.Value);
-                        if (Directory.Exists(directory))
+                        if (string.IsNullOrWhiteSpace(parameter.Value))
                         {
-                            var files = Directory.GetFiles(directory, filePattern, SearchOption.TopDirectoryOnly);
-                            inputs.AddRange(files);
+                            Console.Error.WriteLine("A value is required for input.");
+                            return ExitCodes.InvalidInputOrConfig;
+                        }
+                        var filePattern = Path.GetFileName(parameter.Value);
+                        //The value contains a pattern.
+                        if (filePattern.Contains('*') || filePattern.Contains('?'))
+                        {
+                            var directory = Path.GetDirectoryName(parameter.Value);
+                            if (Directory.Exists(directory))
+                            {
+                                var files = Directory.GetFiles(directory, filePattern, SearchOption.TopDirectoryOnly);
+                                inputs.AddRange(files);
+                            }
+                        }
+                        else
+                        {
+                            inputs.Add(parameter.Value);
+                        }
+                    }
+                    else if (parameter.Name == "suppress")
+                    {
+                        if (string.IsNullOrWhiteSpace(parameter.Value))
+                        {
+                            ShowInvalidSuppression();
+                            return ExitCodes.InvalidInputOrConfig;
+                        }
+                        foreach (var idString in parameter.Value.Split(',').Select(p => p.Trim()))
+                        {
+                            int id;
+                            if (int.TryParse(idString, out id))
+                            {
+                                suppress.Add(id);
+                            }
+                            else
+                            {
+                                Console.Error.WriteLine($"{idString} is not a valid error ID.");
+                                return ExitCodes.InvalidInputOrConfig;
+                            }
+                        }
+                    }
+                    else if (parameter.Name == "q" || parameter.Name == "quiet")
+                    {
+                        if (!string.IsNullOrWhiteSpace(parameter.Value))
+                        {
+                            Console.Error.WriteLine($"-{parameter.Name} does not expect a value.");
+                            return ExitCodes.InvalidInputOrConfig;
+                        }
+                        quiet = true;
+                    }
+                    else if (parameter.Name == "verbose")
+                    {
+                        if (!string.IsNullOrWhiteSpace(parameter.Value))
+                        {
+                            Console.Error.WriteLine($"-{parameter.Name} does not expect a value.");
+                            return ExitCodes.InvalidInputOrConfig;
+                        }
+                        verbose = true;
+                    }
+
+                    else if (parameter.Name == "report")
+                    {
+                        report = parameter.Value;
+                    }
+                    else if (parameter.Name == "extract")
+                    {
+                        extract = parameter.Value;
+                    }
+                    else if (parameter.Name == "revocation")
+                    {
+                        if (string.IsNullOrWhiteSpace(parameter.Value))
+                        {
+                            Console.Error.WriteLine($"-{parameter.Name} requires a value if specified.");
+                            return ExitCodes.InvalidInputOrConfig;
+                        }
+                        if (!Enum.TryParse(parameter.Value, true, out revocation))
+                        {
+                            Console.Error.WriteLine($"-{parameter.Value} is an unrecognized revocation mode.");
+                            return ExitCodes.InvalidInputOrConfig;
+                        }
+                    }
+                    else if (parameter.Name == "ruleset")
+                    {
+                        if (string.IsNullOrWhiteSpace(parameter.Value))
+                        {
+                            Console.Error.WriteLine($"-{parameter.Name} requires a value if specified.");
+                            return ExitCodes.InvalidInputOrConfig;
+                        }
+                        if (!Enum.TryParse(parameter.Value, true, out ruleSet) || parameter.Value.Equals("all", StringComparison.OrdinalIgnoreCase))
+                        {
+                            Console.Error.WriteLine($"-{parameter.Value} is an unrecognized ruleset.");
+                            return ExitCodes.InvalidInputOrConfig;
                         }
                     }
                     else
                     {
-                        inputs.Add(parameter.Value);
-                    }
-                }
-                else if (parameter.Name == "suppress")
-                {
-                    if (string.IsNullOrWhiteSpace(parameter.Value))
-                    {
-                        ShowInvalidSuppression();
-                        return ExitCodes.InvalidInputOrConfig;
-                    }
-                    foreach(var idString in parameter.Value.Split(',').Select(p => p.Trim()))
-                    {
-                        int id;
-                        if (int.TryParse(idString, out id))
-                        {
-                            suppress.Add(id);
-                        }
-                        else
-                        {
-                            Console.Error.WriteLine($"{idString} is not a valid error ID.");
-                            return ExitCodes.InvalidInputOrConfig;
-                        }
-                    }
-                }
-                else if (parameter.Name == "q" || parameter.Name == "quiet")
-                {
-                    if (!string.IsNullOrWhiteSpace(parameter.Value))
-                    {
-                        Console.Error.WriteLine($"-{parameter.Name} does not expect a value.");
-                        return ExitCodes.InvalidInputOrConfig;
-                    }
-                    quiet = true;
-                }
-                else if (parameter.Name == "verbose")
-                {
-                    if (!string.IsNullOrWhiteSpace(parameter.Value))
-                    {
-                        Console.Error.WriteLine($"-{parameter.Name} does not expect a value.");
-                        return ExitCodes.InvalidInputOrConfig;
-                    }
-                    verbose = true;
-                }
-
-                else if (parameter.Name == "report")
-                {
-                    report = parameter.Value;
-                }
-                else if (parameter.Name == "extract")
-                {
-                    extract = parameter.Value;
-                }
-                else if (parameter.Name == "revocation")
-                {
-                    if (string.IsNullOrWhiteSpace(parameter.Value))
-                    {
-                        Console.Error.WriteLine($"-{parameter.Name} requires a value if specified.");
-                        return ExitCodes.InvalidInputOrConfig;
-                    }
-                    if (!Enum.TryParse(parameter.Value, true, out revocation))
-                    {
-                        Console.Error.WriteLine($"-{parameter.Value} is an unrecognized revocation mode.");
+                        Console.Error.WriteLine($"-{parameter.Name} is an unknown parameter.");
                         return ExitCodes.InvalidInputOrConfig;
                     }
                 }
-                else if (parameter.Name == "ruleset")
+                if (inputs.Count == 0)
                 {
-                    if (string.IsNullOrWhiteSpace(parameter.Value))
-                    {
-                        Console.Error.WriteLine($"-{parameter.Name} requires a value if specified.");
-                        return ExitCodes.InvalidInputOrConfig;
-                    }
-                    if (!Enum.TryParse(parameter.Value, true, out ruleSet) || parameter.Value.Equals("all", StringComparison.OrdinalIgnoreCase))
-                    {
-                        Console.Error.WriteLine($"-{parameter.Value} is an unrecognized ruleset.");
-                        return ExitCodes.InvalidInputOrConfig;
-                    }
-                }
-                else
-                {
-                    Console.Error.WriteLine($"-{parameter.Name} is an unknown parameter.");
+                    Console.Error.WriteLine("Input is expected. See -help for usage.");
                     return ExitCodes.InvalidInputOrConfig;
                 }
-            }
-            if (inputs.Count == 0)
-            {
-                Console.Error.WriteLine("Input is expected. See -help for usage.");
-                return ExitCodes.InvalidInputOrConfig;
-            }
-            var configuration = new CheckConfiguration(inputs, report, quiet, suppress, verbose, revocation, extract, ruleSet);
+                var configuration = new CheckConfiguration(inputs, report, quiet, suppress, verbose, revocation, extract, ruleSet);
 
-            if (!ConfigurationValidator.ValidateAndPrint(configuration, Console.Error))
-            {
-                return ExitCodes.InvalidInputOrConfig;
-            }
-            var collectors = new List<IRuleResultCollector>();
-            if (!quiet)
-            {
-                collectors.Add(new StdOutRuleResultCollector());
-            }
-            if (!string.IsNullOrWhiteSpace(report))
-            {
-                collectors.Add(new XmlRuleResultCollector(report));
-            }
-            var result = ExitCodes.Success;
-            foreach (var file in inputs)
-            {
-                var signatures = SignatureTreeInspector.Extract(file);
-                if (CheckEngine.Instance.RunAllRules(file, signatures, collectors, configuration) != RuleEngineResult.AllPass)
+                if (!ConfigurationValidator.ValidateAndPrint(configuration, Console.Error))
                 {
-                    result = ExitCodes.ChecksFailed;
+                    return ExitCodes.InvalidInputOrConfig;
                 }
+                var collectors = new List<IRuleResultCollector>();
+                if (!quiet)
+                {
+                    collectors.Add(new StdOutRuleResultCollector());
+                }
+                if (!string.IsNullOrWhiteSpace(report))
+                {
+                    collectors.Add(new XmlRuleResultCollector(report));
+                }
+                var result = ExitCodes.Success;
+                foreach (var file in inputs)
+                {
+                    var signatures = SignatureTreeInspector.Extract(file);
+                    if (CheckEngine.Instance.RunAllRules(file, signatures, collectors, configuration) != RuleEngineResult.AllPass)
+                    {
+                        result = ExitCodes.ChecksFailed;
+                    }
+                }
+                collectors.ForEach(c => c.Flush());
+                return result;
             }
-            collectors.ForEach(c => c.Flush());
-            return result;
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.ToString());
+                return ExitCodes.UnknownResults;
+            }
         }
 
         static void ShowInvalidSuppression() => Console.Error.WriteLine("Invalid list of errors to suppress. Use -help for more information.");
