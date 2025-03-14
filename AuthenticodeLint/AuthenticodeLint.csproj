@@ -11,13 +11,18 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>authlint</ToolCommandName>
     <Description>Authenticode Lint is a Windows command-line tool for linting an examining an Authenticode signed file.</Description>
-    <Authors>Kevin Jones</Authors>
     <PackageTags>authenticode</PackageTags>
     <PackageProjectUrl>https://github.com/vcsjones/AuthenticodeLint</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vcsjones/AuthenticodeLint</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <Nullable>enable</Nullable>
+    <RuntimeIdentifiers>win-x64;win-arm64;win-x86</RuntimeIdentifiers>
+    <PublishAot Condition="$(RuntimeIdentifier.EndsWith('64'))">true</PublishAot>
+    <EventSourceSupport>false</EventSourceSupport>
+    <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+    <OptimizationPreference>Size</OptimizationPreference>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AuthenticodeExaminer" Version="0.4.0" />
