@@ -27,7 +27,7 @@ namespace AuthenticodeLint.Rules
                 foreach (var counterSignature in counterSignatures)
                 {
                     isSigned = true;
-                    if (counterSignature.DigestAlgorithm.Value == signature.DigestAlgorithm.Value)
+                    if (counterSignature.DigestAlgorithm!.Value == signature.DigestAlgorithm!.Value)
                     {
                         strongSign = true;
                         break;
@@ -44,7 +44,7 @@ namespace AuthenticodeLint.Rules
                 }
                 else if (!strongSign)
                 {
-                    verboseWriter.LogSignatureMessage(signature, $"Signature is not timestamped with the expected hash algorithm {signature.DigestAlgorithm.FriendlyName}.");
+                    verboseWriter.LogSignatureMessage(signature, $"Signature is not timestamped with the expected hash algorithm {signature.DigestAlgorithm!.FriendlyName}.");
                     pass = false;
                 }
             }

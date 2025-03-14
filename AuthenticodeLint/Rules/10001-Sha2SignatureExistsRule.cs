@@ -18,7 +18,7 @@ namespace AuthenticodeLint.Rules
         {
             var signatures = graph.VisitAll(SignatureKind.AnySignature);
             if (signatures.Any(s =>
-                s.DigestAlgorithm.Value == KnownOids.SHA256 ||
+                s.DigestAlgorithm!.Value == KnownOids.SHA256 ||
                 s.DigestAlgorithm.Value == KnownOids.SHA384 ||
                 s.DigestAlgorithm.Value == KnownOids.SHA512))
             {

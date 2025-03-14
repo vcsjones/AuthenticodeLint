@@ -1,6 +1,7 @@
 *.lock.json
 *.nuget.props
 *.nuget.targets
+artifacts/
 bin/
 obj/
 out/

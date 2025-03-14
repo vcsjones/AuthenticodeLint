@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Rules
                 return RuleResult.Fail;
             }
             var primary = graph[0];
-            if (primary.DigestAlgorithm.Value != KnownOids.SHA1)
+            if (primary.DigestAlgorithm!.Value != KnownOids.SHA1)
             {
                 verboseWriter.LogSignatureMessage(primary, $"Expected {nameof(KnownOids.SHA1)} digest algorithm but is {primary.DigestAlgorithm.FriendlyName}.");
                 return RuleResult.Fail;

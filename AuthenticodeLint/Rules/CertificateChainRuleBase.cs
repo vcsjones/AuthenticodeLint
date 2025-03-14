@@ -30,10 +30,10 @@ namespace AuthenticodeLint.Rules
                     //It is possible to have a valid Authenticode signature if the certificate is expired but was
                     //timestamped while it was valid. In this case we still want to successfully build a chain to perform validation.
                     chain.ChainPolicy.VerificationFlags = X509VerificationFlags.IgnoreNotTimeValid;
-                    bool success = chain.Build(signature.Certificate);
+                    bool success = chain.Build(signature.Certificate!);
                     if (!success)
                     {
-                        verboseWriter.LogSignatureMessage(signature, $"Cannot build a chain successfully with signing certificate {signature.Certificate.SerialNumber}.");
+                        verboseWriter.LogSignatureMessage(signature, $"Cannot build a chain successfully with signing certificate {signature.Certificate!.SerialNumber}.");
                         result = RuleResult.Fail;
                         continue;
                     }

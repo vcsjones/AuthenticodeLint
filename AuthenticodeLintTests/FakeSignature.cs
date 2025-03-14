@@ -1,5 +1,6 @@
 ﻿using AuthenticodeExaminer;
 using AuthenticodeLint;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -17,6 +18,7 @@ namespace AuthenticodeLintTests
         public SignatureKind Kind { get; set; }
         public IReadOnlyList<CryptographicAttributeObject> SignedAttributes { get; set; }
         public IReadOnlyList<CryptographicAttributeObject> UnsignedAttributes { get; set; }
+        public ReadOnlyMemory<byte> Signature => ReadOnlyMemory<byte>.Empty;
 
         public HashAlgorithmName DigestAlgorithmName => throw new System.NotImplementedException();
 

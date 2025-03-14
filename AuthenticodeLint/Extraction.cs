@@ -11,7 +11,7 @@ namespace AuthenticodeLint
     {
         public static void ExtractToDisk(string file, CheckConfiguration configuration, IReadOnlyList<ICmsSignature> signatureGraph)
         {
-            var fileDirectory = Path.Combine(configuration.ExtractPath, Path.GetFileName(file));
+            var fileDirectory = Path.Combine(configuration.ExtractPath!, Path.GetFileName(file));
             if (Directory.Exists(fileDirectory))
             {
                 Directory.Delete(fileDirectory, true);
