@@ -17,12 +17,24 @@ namespace AuthenticodeLint
 
         public IReadOnlyList<IAuthenticodeRule> GetRules()
         {
-            return (from type in typeof(IAuthenticodeRule).Assembly.GetExportedTypes()
-                    where typeof(IAuthenticodeRule).IsAssignableFrom(type) && type.GetConstructor(Type.EmptyTypes) != null
-                    let instance = (IAuthenticodeRule)Activator.CreateInstance(type)! // We know this should not be null.
-                    orderby instance.RuleId
-                    select instance
-                    ).ToList();
+            return
+            [
+                new Sha1PrimarySignatureRule(),
+                new Sha2SignatureExistsRule(),
+                new NoWeakFileDigestAlgorithmsRule(),
+                new TimestampedRule(),
+                new PublisherInformationPresentRule(),
+                new PublisherInformationUrlHttpsRule(),
+                new SigningCertificateDigestAlgorithmRule(),
+                new TrustedSignatureRule(),
+                new WinCertificatePaddingRule(),
+                new NoUnknownUnsignedAttibuteRule(),
+                new StrongKeyLengthRule(),
+                new RsaDsaPrimarySignatureRule(),
+                new MaxKeyLengthRule(),
+                new SinglePrimarySignatureRule(),
+                new NoSha1Rule(),
+            ];
         }
 
         public RuleEngineResult RunAllRules(string file, IReadOnlyList<ICmsSignature> signatures, List<IRuleResultCollector> collectors, CheckConfiguration configuration)
