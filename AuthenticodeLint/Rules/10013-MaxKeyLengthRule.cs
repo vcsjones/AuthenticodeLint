@@ -23,6 +23,11 @@ namespace AuthenticodeLint.Rules
             var result = RuleResult.Pass;
             foreach (var signature in signatures)
             {
+                if (signature.Certificate is null)
+                {
+                    continue;
+                }
+
                 var keyInfo = BitStrengthCalculator.CalculateStrength(signature.Certificate);
                 switch (keyInfo.AlgorithmName)
                 {

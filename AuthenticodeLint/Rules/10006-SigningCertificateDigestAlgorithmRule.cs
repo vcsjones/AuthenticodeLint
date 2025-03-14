@@ -20,7 +20,7 @@ namespace AuthenticodeLint.Rules
 
         private static bool ValidateStrongChain(ICmsSignature signature, X509Chain chain, SignatureLogger verboseWriter)
         {
-            var signatureStrength = GetHashStrenghForComparison(signature.DigestAlgorithm.Value!);
+            var signatureStrength = GetHashStrenghForComparison(signature.DigestAlgorithm?.Value!);
             var strongShaChain = true;
             var leafCertificateSignatureAlgorithm = chain.ChainElements[0].Certificate.SignatureAlgorithm;
             var leafCertificateSignatureAlgorithmStrength = GetHashStrenghForComparison(leafCertificateSignatureAlgorithm.Value!);
@@ -32,13 +32,13 @@ namespace AuthenticodeLint.Rules
                 var certificateHashStrength = GetHashStrenghForComparison(signatureAlgorithm.Value!);
                 if (certificateHashStrength < signatureStrength)
                 {
-                    verboseWriter.LogSignatureMessage(signature, $"Certificate {element.Certificate.Thumbprint} in chain uses {element.Certificate.SignatureAlgorithm.FriendlyName} for its signature algorithm instead of at least {signature.DigestAlgorithm.FriendlyName}.");
+                    verboseWriter.LogSignatureMessage(signature, $"Certificate {element.Certificate.Thumbprint} in chain uses {element.Certificate.SignatureAlgorithm.FriendlyName} for its signature algorithm instead of at least {signature.DigestAlgorithm!.FriendlyName}.");
                     strongShaChain = false;
                 }
                 //Check that all intermediates are at least as strong as the leaf.
                 else if (certificateHashStrength < leafCertificateSignatureAlgorithmStrength)
                 {
-                    verboseWriter.LogSignatureMessage(signature, $"Certificate {element.Certificate.Thumbprint} in chain uses {element.Certificate.SignatureAlgorithm.FriendlyName} for its signature algorithm instead of at least {signature.DigestAlgorithm.FriendlyName}.");
+                    verboseWriter.LogSignatureMessage(signature, $"Certificate {element.Certificate.Thumbprint} in chain uses {element.Certificate.SignatureAlgorithm.FriendlyName} for its signature algorithm instead of at least {signature.DigestAlgorithm!.FriendlyName}.");
                 }
             }
             return strongShaChain;

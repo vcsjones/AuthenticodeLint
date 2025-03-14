@@ -19,7 +19,7 @@ namespace AuthenticodeLint.Rules
             var result = RuleResult.Pass;
             foreach (var signature in signatures)
             {
-                
+
                 var certificates = signature.AdditionalCertificates;
                 using (var chain = new X509Chain())
                 {
@@ -30,6 +30,12 @@ namespace AuthenticodeLint.Rules
                     //It is possible to have a valid Authenticode signature if the certificate is expired but was
                     //timestamped while it was valid. In this case we still want to successfully build a chain to perform validation.
                     chain.ChainPolicy.VerificationFlags = X509VerificationFlags.IgnoreNotTimeValid;
+
+                    if (signature.Certificate is null)
+                    {
+                        continue;
+                    }
+
                     bool success = chain.Build(signature.Certificate);
                     if (!success)
                     {

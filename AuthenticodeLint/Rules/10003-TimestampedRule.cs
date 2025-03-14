@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using AuthenticodeExaminer;
 
@@ -27,7 +28,9 @@ namespace AuthenticodeLint.Rules
                 foreach (var counterSignature in counterSignatures)
                 {
                     isSigned = true;
-                    if (counterSignature.DigestAlgorithm.Value == signature.DigestAlgorithm.Value)
+                    if (counterSignature is { DigestAlgorithm.Value: string counterAlg } &&
+                        signature is { DigestAlgorithm.Value: string alg } &&
+                        alg == counterAlg)
                     {
                         strongSign = true;
                         break;
@@ -44,6 +47,7 @@ namespace AuthenticodeLint.Rules
                 }
                 else if (!strongSign)
                 {
+                    Debug.Assert(signature.DigestAlgorithm is not null);
                     verboseWriter.LogSignatureMessage(signature, $"Signature is not timestamped with the expected hash algorithm {signature.DigestAlgorithm.FriendlyName}.");
                     pass = false;
                 }

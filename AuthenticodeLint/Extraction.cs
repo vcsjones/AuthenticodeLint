@@ -1,6 +1,7 @@
 ﻿using AuthenticodeExaminer;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -11,6 +12,7 @@ namespace AuthenticodeLint
     {
         public static void ExtractToDisk(string file, CheckConfiguration configuration, IReadOnlyList<ICmsSignature> signatureGraph)
         {
+            Debug.Assert(configuration.ExtractPath is not null);
             var fileDirectory = Path.Combine(configuration.ExtractPath, Path.GetFileName(file));
             if (Directory.Exists(fileDirectory))
             {

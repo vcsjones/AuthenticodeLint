@@ -22,6 +22,13 @@ namespace AuthenticodeLint.Rules
             {
                 return RuleResult.Fail;
             }
+
+            if (primary.Certificate is null)
+            {
+                verboseWriter.LogSignatureMessage(primary, $"Signature does not contain a certificate.");
+                return RuleResult.Fail;
+            }
+
             var info = BitStrengthCalculator.CalculateStrength(primary.Certificate);
             if (info.AlgorithmName != PublicKeyAlgorithm.RSA && info.AlgorithmName != PublicKeyAlgorithm.DSA)
             {
